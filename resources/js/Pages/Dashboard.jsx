@@ -13,8 +13,8 @@ export default function Dashboard(props) {
                 />
             </div>
             <div className="mb-8 flex flex-col">
-                <h2 className="text-xl font-medium leading-relaxed text-foreground">Hi, Indra</h2>
-                <p className="text-sm text-muted-foreground"> Selamat datang di platform System</p>
+                <h2 className="text-xl font-medium leading-relaxed text-foreground">Hi, {props.auth.user.name}</h2>
+                <p className="text-sm text-muted-foreground"> Selamat datang di Lumos Inventory System</p>
             </div>
         </div>
     );

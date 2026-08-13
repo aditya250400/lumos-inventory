@@ -54,4 +54,29 @@ class User extends Authenticatable
             return [$pr['name'] => true];
         });
     }
+
+    public function locations()
+    {
+        return $this->hasMany(Location::class);
+    }
+
+    public function loansCreatedBy()
+    {
+        return $this->hasMany(Loan::class, 'created_by');
+    }
+
+    public function loans()
+    {
+        return $this->hasMany(Loan::class, 'loan_by');
+    }
+
+    public function tools()
+    {
+        return $this->hasMany(Tool::class, 'used_by');
+    }
+
+    public function stockOpname()
+    {
+        return $this->hasMany(User::class, 'created_by');
+    }
 }
