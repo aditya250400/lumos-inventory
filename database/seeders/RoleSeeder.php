@@ -70,7 +70,7 @@ class RoleSeeder extends Seeder
 
         // Koordinator Internal
         $koordinator = Role::firstOrCreate([
-            'name' => 'koordinator internal',
+            'name' => 'Koordinator Internal',
             'guard_name' => 'web',
         ]);
 
@@ -78,7 +78,7 @@ class RoleSeeder extends Seeder
 
         // Owner
         $owner = Role::firstOrCreate([
-            'name' => 'owner',
+            'name' => 'Owner',
             'guard_name' => 'web',
         ]);
 
@@ -86,7 +86,7 @@ class RoleSeeder extends Seeder
 
         // Teknisi
         $teknisi = Role::firstOrCreate([
-            'name' => 'teknisi',
+            'name' => 'Teknisi',
             'guard_name' => 'web',
         ]);
 
@@ -94,7 +94,7 @@ class RoleSeeder extends Seeder
 
         // Admin
         $admin = Role::firstOrCreate([
-            'name' => 'admin',
+            'name' => 'Admin',
             'guard_name' => 'web',
         ]);
 

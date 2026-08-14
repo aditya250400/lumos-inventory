@@ -13,6 +13,7 @@ import {
     IconFileText,
     IconListDetails,
     IconClipboardList,
+    IconLocation,
 } from '@tabler/icons-react';
 
 export default function SidebarResponsive({ auth, url }) {
@@ -37,18 +38,35 @@ export default function SidebarResponsive({ auth, url }) {
                     </Link>
                 </li>
 
-                <NavLink url="#" active="#" title="Dashboard" icon={IconLayout2} />
+                <NavLink
+                    url={route('dashboard')}
+                    active={url.startsWith('/dashboard')}
+                    title="Dashboard"
+                    icon={IconLayout2}
+                />
 
-                {/* Data Master */}
+                {/* Grup: Aktivitas */}
+                <div className="px-3 py-2 text-base font-medium text-white">Aktivitas</div>
+
+                <NavLink url="#" title="Aktivitas 1" icon={IconClipboardList} />
+
+                <NavLink url="#" title="Laporan" icon={IconFileText} />
+
+                {/* Grup: Data Master */}
                 <div className="px-3 py-2 text-base font-medium text-white">Data Master</div>
 
-                <NavLink url="#" title="Master Resource 1" icon={IconFolder} />
+                <NavLink
+                    url={route('location.index')}
+                    active={url.startsWith('/locations')}
+                    title="Lokasi"
+                    icon={IconLocation}
+                />
 
                 <NavLink url="#" title="Master Resource 2" icon={IconFolders} />
 
                 <NavLink url="#" title="Pengaturan" icon={IconSettings} />
 
-                {/* Manajemen Pengguna */}
+                {/* Grup: Manajemen Pengguna */}
                 <div className="px-3 py-2 text-base font-medium text-white">Manajemen Pengguna</div>
 
                 <NavLink url="#" title="Pengguna Tipe A" icon={IconUsers} />
@@ -57,14 +75,7 @@ export default function SidebarResponsive({ auth, url }) {
 
                 <NavLink url="#" title="Pengguna Tipe C" icon={IconUser} />
 
-                {/* Aktivitas */}
-                <div className="px-3 py-2 text-base font-medium text-white">Aktivitas</div>
-
-                <NavLink url="#" title="Aktivitas 1" icon={IconClipboardList} />
-
-                <NavLink url="#" title="Laporan" icon={IconFileText} />
-
-                {/* Role 2 */}
+                {/* ROLE 2 */}
                 <NavLink url="#" title="Dashboard" icon={IconLayout2} />
 
                 <div className="px-3 py-1 text-base font-medium text-white">Grup Menu 1</div>
@@ -73,7 +84,7 @@ export default function SidebarResponsive({ auth, url }) {
 
                 <NavLink url="#" title="Resource 2" icon={IconFolder} />
 
-                {/* Role 3 */}
+                {/* ROLE 3 */}
                 <NavLink url="#" title="Dashboard" icon={IconLayout2} />
 
                 <div className="px-3 py-1 text-base font-medium text-white">Grup Menu 1</div>

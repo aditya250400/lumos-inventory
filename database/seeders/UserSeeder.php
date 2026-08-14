@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Indra Nurhaidir',
-                'email' => 'indranurhaidir@gmail.com',
+                'email' => 'indra@gmail.com',
                 'role' => 'teknisi',
             ],
             [
