@@ -28,6 +28,8 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import CreateLocationModal from './CreateLocationModal';
 import EditLocationModal from './EditLocationModal';
+import ViewSwitcher from '@/Components/ViewSwitcher';
+import useViewMode from '@/hooks/UseViewMode';
 
 const VIEW_STORAGE_KEY = 'location-index-view';
 
@@ -39,8 +41,8 @@ function getInitialView() {
 export default function Index(props) {
     const { data: locations, meta, links } = props.locations;
     const [params, setParams] = useState(props.state);
-    const [view, setView] = useState(getInitialView);
     const [createOpen, setCreateOpen] = useState(false);
+    const [view, setView] = useViewMode('location-index-view', 'card');
     const [editingLocation, setEditingLocation] = useState(null);
 
     const onSortable = (field) => {
@@ -56,10 +58,6 @@ export default function Index(props) {
         values: params,
         only: ['locations'],
     });
-
-    useEffect(() => {
-        localStorage.setItem(VIEW_STORAGE_KEY, view);
-    }, [view]);
 
     return (
         <>
@@ -111,28 +109,7 @@ export default function Index(props) {
                             </div>
 
                             {/* Switch tampilan Card / Tabel */}
-                            <div className="flex shrink-0 rounded-lg border p-0.5">
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    variant={view === 'card' ? 'blue' : 'ghost'}
-                                    className="gap-1.5"
-                                    onClick={() => setView('card')}
-                                >
-                                    <IconLayoutGrid className="size-4" />
-                                    Card
-                                </Button>
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    variant={view === 'table' ? 'blue' : 'ghost'}
-                                    className="gap-1.5"
-                                    onClick={() => setView('table')}
-                                >
-                                    <IconTable className="size-4" />
-                                    Tabel
-                                </Button>
-                            </div>
+                            <ViewSwitcher value={view} onChange={setView} />
                         </div>
                         {/* show filter */}
                         <ShowFilter params={params} />
@@ -202,8 +179,15 @@ export default function Index(props) {
                                             </Button>
                                         </TableHead>
                                         <TableHead>
-                                            <Button variant="ghost" className="group inline-flex">
+                                            <Button
+                                                onClick={() => onSortable('total_tools')}
+                                                variant="ghost"
+                                                className="group inline-flex"
+                                            >
                                                 Total Tool
+                                                <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                    <IconArrowsDownUp className="size-4" />
+                                                </span>
                                             </Button>
                                         </TableHead>
                                         <TableHead>

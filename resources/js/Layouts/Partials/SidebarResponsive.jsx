@@ -4,16 +4,15 @@ import { Link } from '@inertiajs/react';
 import {
     IconLayout2,
     IconLogout2,
-    IconFolder,
-    IconFolders,
-    IconSettings,
     IconUser,
     IconUsers,
-    IconUsersGroup,
     IconFileText,
-    IconListDetails,
-    IconClipboardList,
     IconLocation,
+    IconCategory2,
+    IconTools,
+    IconPrinter,
+    IconPencilCheck,
+    IconShieldCode,
 } from '@tabler/icons-react';
 
 export default function SidebarResponsive({ auth, url }) {
@@ -48,9 +47,10 @@ export default function SidebarResponsive({ auth, url }) {
                 {/* Grup: Aktivitas */}
                 <div className="px-3 py-2 text-base font-medium text-white">Aktivitas</div>
 
-                <NavLink url="#" title="Aktivitas 1" icon={IconClipboardList} />
+                <NavLink url="#" title="Stock Opname" icon={IconPencilCheck} />
 
                 <NavLink url="#" title="Laporan" icon={IconFileText} />
+                <NavLink url="#" title="Cetak Dokumen" icon={IconPrinter} />
 
                 {/* Grup: Data Master */}
                 <div className="px-3 py-2 text-base font-medium text-white">Data Master</div>
@@ -61,38 +61,19 @@ export default function SidebarResponsive({ auth, url }) {
                     title="Lokasi"
                     icon={IconLocation}
                 />
-
-                <NavLink url="#" title="Master Resource 2" icon={IconFolders} />
-
-                <NavLink url="#" title="Pengaturan" icon={IconSettings} />
-
-                {/* Grup: Manajemen Pengguna */}
-                <div className="px-3 py-2 text-base font-medium text-white">Manajemen Pengguna</div>
-
-                <NavLink url="#" title="Pengguna Tipe A" icon={IconUsers} />
-
-                <NavLink url="#" title="Pengguna Tipe B" icon={IconUsersGroup} />
-
-                <NavLink url="#" title="Pengguna Tipe C" icon={IconUser} />
-
-                {/* ROLE 2 */}
-                <NavLink url="#" title="Dashboard" icon={IconLayout2} />
-
-                <div className="px-3 py-1 text-base font-medium text-white">Grup Menu 1</div>
-
-                <NavLink url="#" title="Resource 1" icon={IconListDetails} />
-
-                <NavLink url="#" title="Resource 2" icon={IconFolder} />
-
-                {/* ROLE 3 */}
-                <NavLink url="#" title="Dashboard" icon={IconLayout2} />
-
-                <div className="px-3 py-1 text-base font-medium text-white">Grup Menu 1</div>
-
-                <NavLink url="#" title="Resource 1" icon={IconUsers} />
+                <NavLink
+                    url={route('category.index')}
+                    active={url.startsWith('/categories')}
+                    title="Kategori Tools"
+                    icon={IconCategory2}
+                />
+                <NavLink url={'#'} active={url.startsWith('/tools')} title="Tools" icon={IconTools} />
+                <NavLink url={'#'} active={url.startsWith('/roles')} title="Roles" icon={IconShieldCode} />
+                <NavLink url={'#'} active={url.startsWith('/users')} title="Pengguna" icon={IconUsers} />
 
                 {/* Lainnya */}
                 <div className="px-3 py-1 text-base font-medium text-white">Lainnya</div>
+                <NavLink url={'#'} active={url.startsWith('/users')} title="Akun" icon={IconUser} />
 
                 <NavLink
                     url={route('logout')}

@@ -17,9 +17,8 @@ class LocationController extends Controller
 {
     public function index()
     {
-        $locations = Location
-            ::filter(request()->only(['search']))
-            ->sorting(request()->only(['field', 'direction']))
+        $locations = Location::query()
+            ->filter(request()->only(['search']))
             ->whereNull('parent_id')
             ->withCount(['tools', 'children'])
             ->withSum('tools', 'stock')
@@ -30,8 +29,46 @@ class LocationController extends Controller
                         ->withSum('tools', 'stock');
                 },
             ])
+            ->selectSub(function ($query) {
+                $query->from('tools')
+                    ->selectRaw('COUNT(*)')
+                    ->whereIn('location_id', function ($query) {
+                        $query->select('id')
+                            ->from('locations')
+                            ->whereColumn('parent_id', 'locations.id');
+                    });
+            }, 'children_tools_count')
+            ->selectRaw('
+        (
+            SELECT COUNT(*)
+            FROM tools
+            WHERE tools.location_id = locations.id
+        ) + (
+            SELECT COUNT(*)
+            FROM tools
+            WHERE tools.location_id IN (
+                SELECT id
+                FROM locations AS children
+                WHERE children.parent_id = locations.id
+            )
+        ) AS total_tools
+    ')
+            ->when(
+                request('field') === 'total_tools',
+                fn($query) => $query->orderBy(
+                    'total_tools',
+                    request('direction', 'asc')
+                )
+            )
+            ->when(
+                request('field') !== 'total_tools',
+                fn($query) => $query->sorting(
+                    request()->only(['field', 'direction'])
+                )
+            )
             ->orderBy('name')
             ->paginate(request()->load ?? 10);
+
 
         return inertia('Location/Index', [
             'page_settings' => [

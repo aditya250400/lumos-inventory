@@ -155,7 +155,12 @@ export default function Show({ auth, location, users }) {
                             )}
 
                             <CardContent className="pt-6">
-                                <p className="font-bold">{sub.name}</p>
+                                <Link
+                                    href={route('location.sub-locations.show', [location.slug, sub.slug])}
+                                    className="font-bold"
+                                >
+                                    {sub.name}
+                                </Link>
                                 <p className="mt-2 text-sm text-muted-foreground">
                                     {sub.tools_count} tools . {sub.total_stock} stok
                                 </p>
