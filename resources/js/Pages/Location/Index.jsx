@@ -27,6 +27,7 @@ import {
 } from '@tabler/icons-react';
 import { useEffect, useMemo, useState } from 'react';
 import CreateLocationModal from './CreateLocationModal';
+import EditLocationModal from './EditLocationModal';
 
 const VIEW_STORAGE_KEY = 'location-index-view';
 
@@ -40,6 +41,7 @@ export default function Index(props) {
     const [params, setParams] = useState(props.state);
     const [view, setView] = useState(getInitialView);
     const [createOpen, setCreateOpen] = useState(false);
+    const [editingLocation, setEditingLocation] = useState(null);
 
     const onSortable = (field) => {
         setParams({
@@ -58,10 +60,6 @@ export default function Index(props) {
     useEffect(() => {
         localStorage.setItem(VIEW_STORAGE_KEY, view);
     }, [view]);
-
-    // Index cuma nampilin lokasi top-level (parent_id null), jadi list ini
-    // langsung dipakai sebagai opsi "Sub Lokasi Dari" di modal create.
-    const parentOptions = useMemo(() => locations.map((l) => ({ id: l.id, name: l.name })), [locations]);
 
     return (
         <>
@@ -150,7 +148,12 @@ export default function Index(props) {
                         ) : view === 'card' ? (
                             <div className="grid grid-cols-1 gap-4 px-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {locations.map((location) => (
-                                    <LocationCard key={location.id} location={location} auth={props.auth} />
+                                    <LocationCard
+                                        setEditingLocation={setEditingLocation}
+                                        key={location.id}
+                                        location={location}
+                                        auth={props.auth}
+                                    />
                                 ))}
 
                                 {hasAnyPermissions(props.auth.permissions, ['location.create']) && (
@@ -254,11 +257,13 @@ export default function Index(props) {
                                                         {hasAnyPermissions(props.auth.permissions, [
                                                             'location.update',
                                                         ]) && (
-                                                            <Button variant="blue" size="sm" asChild>
-                                                                <Link href={route('location.edit', [location])}>
-                                                                    <IconPencil size="4" />
-                                                                    Edit
-                                                                </Link>
+                                                            <Button
+                                                                onClick={() => setEditingLocation(location)}
+                                                                variant="blue"
+                                                                size="sm"
+                                                            >
+                                                                <IconPencil size="4" />
+                                                                Edit
                                                             </Button>
                                                         )}
                                                         {hasAnyPermissions(props.auth.permissions, [
@@ -303,7 +308,13 @@ export default function Index(props) {
                 method={props.page_settings.method}
                 open={createOpen}
                 onOpenChange={setCreateOpen}
-                parentOptions={parentOptions}
+            />
+            <EditLocationModal
+                open={editingLocation !== null}
+                onOpenChange={(isOpen) => !isOpen && setEditingLocation(null)}
+                location={editingLocation}
+                users={props.users}
+                method="PUT"
             />
         </>
     );

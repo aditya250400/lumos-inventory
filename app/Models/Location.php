@@ -41,6 +41,11 @@ class Location extends Model
         return $this->hasMany(Location::class, 'parent_id');
     }
 
+    public function subLocations()
+    {
+        return $this->hasMany(Location::class, 'parent_id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -27,12 +27,20 @@ Route::middleware('auth')->group(function () {
     Route::controller(LocationController::class)->group(function () {
         Route::get('locations', 'index')->name('location.index')->middleware('permission:location.index');
         Route::get('locations/{location:slug}', 'show')->name('location.show');
-        Route::get('locations/create', 'create')->name('location.create')->middleware('permission:location.create');
         Route::post('locations/create', 'store')->name('location.store')->middleware('permission:location.create');
-        Route::get('locations/edit/{location:slug}', 'edit')->name('location.edit')->middleware('permission:location.update');
         Route::put('locations/edit/{location:slug}', 'update')->name('location.update')->middleware('permission:location.update');
         Route::delete('locations/destroy/{location:slug}', 'destroy')->name('location.destroy')->middleware('permission:location.delete');
     });
+
+    //sub location
+    Route::prefix('locations/{location:slug}/sub-locations')
+        ->name('location.sub-locations.')
+        ->group(function () {
+            Route::post('/', [LocationController::class, 'storeSubLocation'])->name('store');
+            Route::get('/{subLocation:slug}', [LocationController::class, 'updateSubLocation'])->name('show');
+            Route::put('/{subLocation:slug}', [LocationController::class, 'updateSubLocation'])->name('update');
+            Route::delete('/{subLocation:slug}', [LocationController::class, 'destroySubLocation'])->name('destroy');
+        });
 });
 
 

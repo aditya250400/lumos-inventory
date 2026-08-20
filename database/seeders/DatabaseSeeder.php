@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CategorySeeder::class,
             LocationSeeder::class,
+            ToolSeeder::class,
         ]);
     }
 }

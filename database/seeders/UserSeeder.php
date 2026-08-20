@@ -26,6 +26,11 @@ class UserSeeder extends Seeder
                 'role' => 'teknisi',
             ],
             [
+                'name' => 'Razzan Naufal Rabbani',
+                'email' => 'razzan@gmail.com',
+                'role' => 'teknisi',
+            ],
+            [
                 'name' => 'Imam',
                 'email' => 'imam@gmail.com',
                 'role' => 'teknisi',

@@ -7,7 +7,7 @@ enum MessageType: string
     case CREATED = 'Berhasil menambahkan';
     case UPDATED = 'Berhasil memperbarui';
     case DELETED = 'Berhasil menghapus';
-    case ERROR = 'Terjadi kesalahan. Silahkan coba lagi nanti';
+    case ERROR = 'Terjadi kesalahan. ';
 
     public function message($entity = '', $error = null)
     {

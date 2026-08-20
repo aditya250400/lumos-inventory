@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Enums\MessageType;
 use App\Http\Requests\LocationRequest;
+use App\Http\Requests\SubLocationRequest;
 use App\Http\Resources\LocationResource;
 use App\Models\Location;
+use App\Models\Tool;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,8 +21,15 @@ class LocationController extends Controller
             ::filter(request()->only(['search']))
             ->sorting(request()->only(['field', 'direction']))
             ->whereNull('parent_id')
-            ->withSum('tools', 'stock')
             ->withCount(['tools', 'children'])
+            ->withSum('tools', 'stock')
+            ->with([
+                'children' => function ($query) {
+                    $query
+                        ->withCount('tools')
+                        ->withSum('tools', 'stock');
+                },
+            ])
             ->orderBy('name')
             ->paginate(request()->load ?? 10);
 
@@ -49,7 +58,50 @@ class LocationController extends Controller
         ]);
     }
 
-    public function show() {}
+    public function show(Location $location)
+    {
+        $location->loadCount(['tools', 'children'])
+            ->loadSum('tools', 'stock');
+
+        $location->load(['children' => function ($query) {
+            $query->withCount('tools')
+                ->withSum('tools', 'stock')
+                ->orderBy('tools_count', 'desc');
+        }]);
+
+        // "Semua sub lokasi" di UI itu agregat: tools milik lokasi ini sendiri + semua sub lokasinya
+        $totalToolsAll = $location->tools_count + $location->children->sum('tools_count');
+        $totalStockAll = ($location->tools_sum_stock ?? 0) + $location->children->sum('tools_sum_stock');
+
+        return inertia('Location/Show', [
+            'page_settings' => [
+                'title' => $location->name,
+                'subtitle' => "Detail lokasi {$location->name}",
+            ],
+            'location' => [
+                'id' => $location->id,
+                'name' => $location->name,
+                'slug' => $location->slug,
+                'children_count' => $location->children_count,
+                'total_tools' => $totalToolsAll,
+                'total_stock' => $totalStockAll,
+                'tools_parent_count' => $location->tools_count,
+                'tools_parent_stock' => $location->tools_sum_stock,
+                'children' => $location->children->map(fn($child) => [
+                    'id' => $child->id,
+                    'name' => $child->name,
+                    'slug' => $child->slug,
+                    'user_id' => $child->user_id,
+                    'tools_count' => $child->tools_count,
+                    'total_stock' => $child->tools_sum_stock ?? 0,
+                ]),
+            ],
+            'users' => User::orderBy('name')->get()->map(fn($item) => [
+                'id' => $item->id,
+                'name' => $item->name,
+            ]),
+        ]);
+    }
 
 
     public function store(LocationRequest $request)
@@ -79,6 +131,153 @@ class LocationController extends Controller
         } catch (Throwable $e) {
             flashMessage(MessageType::ERROR->message(error: $e->getMessage()), 'error');
             return back();
+        }
+    }
+
+    public function update(LocationRequest $request, Location $location)
+    {
+        try {
+            DB::transaction(function () use ($request, $location) {
+                // 1. Update lokasi induknya sendiri
+                $location->update([
+                    'name' => $request['name'],
+                ]);
+
+                $incomingSubs = collect($request['sub_locations'] ?? []);
+                $incomingIds = $incomingSubs->pluck('id')->filter()->all();
+
+                // 2. Cari sub lokasi yang mau dihapus (ada di database, tapi sudah gak ada di payload)
+                $toDelete = $location->children()
+                    ->whereNotIn('id', $incomingIds)
+                    ->withCount('tools')
+                    ->get();
+
+                // 2a. Kalau ada salah satu yang masih punya tools, batalkan seluruh proses
+                //     (dilempar sebagai exception, jadi DB::transaction otomatis rollback semuanya,
+                //     termasuk perubahan nama lokasi & sub lokasi lain yang mungkin sudah sempat diproses).
+                $blocked = $toDelete->firstWhere(fn($child) => $child->tools_count > 0);
+
+                if ($blocked) {
+                    throw new \RuntimeException(
+                        "Sub lokasi \"{$blocked->name}\" tidak bisa dihapus karena masih memiliki {$blocked->tools_count} tools. Pindahkan atau hapus tools tersebut terlebih dahulu."
+                    );
+                }
+
+                // 2b. Aman dihapus (gak ada yang punya tools)
+                $location->children()
+                    ->whereNotIn('id', $incomingIds)
+                    ->delete();
+
+                // 3. Loop payload: yang punya id -> update, yang tidak -> buat baru
+                foreach ($incomingSubs as $sub) {
+                    $payload = [
+                        'name' => $sub['name'],
+                        'parent_id' => $location->id,
+                        'user_id' => ($sub['has_owner'] ?? false) ? $sub['user_id'] : null,
+                    ];
+
+                    if (!empty($sub['id'])) {
+                        Location::whereKey($sub['id'])->update($payload);
+                    } else {
+                        Location::create($payload);
+                    }
+                }
+            });
+
+            flashMessage(MessageType::UPDATED->message('Lokasi'));
+            return to_route('location.index');
+        } catch (Throwable $e) {
+            flashMessage(MessageType::ERROR->message(error: $e->getMessage()), 'error');
+            return back();
+        }
+    }
+
+    public function destroy(Location $location)
+    {
+        try {
+            // Kumpulkan id lokasi ini + semua sub lokasinya, baru hitung total tools
+            // yang nempel ke salah satu dari id-id itu (gak peduli langsung ke induk
+            // atau ke salah satu sub lokasinya).
+            $locationIds = $location->children()->pluck('id')->push($location->id);
+            $totalTools = Tool::whereIn('location_id', $locationIds)->count();
+
+            if ($totalTools > 0) {
+                flashMessage(
+                    "Lokasi \"{$location->name}\" tidak bisa dihapus karena masih ada {$totalTools} tools (termasuk yang ada di sub lokasinya). Pindahkan atau hapus tools tersebut terlebih dahulu.",
+                    'error'
+                );
+                return to_route('location.index');
+            }
+
+            DB::transaction(function () use ($location) {
+                // Aman, gak ada tools sama sekali -> sub lokasinya ikut dihapus juga
+                $location->children()->delete();
+                $location->delete();
+            });
+
+            flashMessage(MessageType::DELETED->message('Lokasi'));
+            return to_route('location.index');
+        } catch (Throwable $e) {
+            flashMessage(MessageType::ERROR->message(error: $e->getMessage()), 'error');
+            return to_route('location.index');
+        }
+    }
+
+    // subs location
+    // ================= Sub-lokasi (nested resource di bawah location) =================
+
+    public function storeSubLocation(SubLocationRequest $request, Location $location)
+    {
+        try {
+            Location::create([
+                'name' => $request['name'],
+                'parent_id' => $location->id,
+                'user_id' => ($request['has_owner'] ?? false) ? $request['user_id'] : null,
+            ]);
+
+            flashMessage(MessageType::CREATED->message('Sub Lokasi'));
+            return to_route('location.show', $location->slug);
+        } catch (Throwable $e) {
+            flashMessage(MessageType::ERROR->message(error: $e->getMessage()), 'error');
+            return back();
+        }
+    }
+
+    public function updateSubLocation(SubLocationRequest $request, Location $location, Location $subLocation)
+    {
+        try {
+            $subLocation->update([
+                'name' => $request['name'],
+                'user_id' => ($request['has_owner'] ?? false) ? $request['user_id'] : null,
+            ]);
+
+            flashMessage(MessageType::UPDATED->message('Sub Lokasi'));
+            return to_route('location.show', $location->slug);
+        } catch (Throwable $e) {
+            flashMessage(MessageType::ERROR->message(error: $e->getMessage()), 'error');
+            return back();
+        }
+    }
+
+    public function destroySubLocation(Location $location, Location $subLocation)
+    {
+        try {
+            $toolsCount = $subLocation->tools()->count();
+
+            if ($toolsCount > 0) {
+                flashMessage(
+                    "Sub lokasi \"{$subLocation->name}\" tidak bisa dihapus karena masih memiliki {$toolsCount} tools.",
+                    'error'
+                );
+                return to_route('location.show', $location->slug);
+            }
+
+            $subLocation->delete();
+            flashMessage(MessageType::DELETED->message('Sub Lokasi'));
+            return to_route('location.show', $location->slug);
+        } catch (Throwable $e) {
+            flashMessage(MessageType::ERROR->message(error: $e->getMessage()), 'error');
+            return to_route('location.show', $location->slug);
         }
     }
 }

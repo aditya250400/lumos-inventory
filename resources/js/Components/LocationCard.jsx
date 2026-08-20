@@ -11,7 +11,7 @@ import hasAnyPermissions, { deleteAction } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { IconDotsVertical, IconEye, IconPencil, IconTrash } from '@tabler/icons-react';
 
-export default function LocationCard({ location, auth }) {
+export default function LocationCard({ location, auth, setEditingLocation }) {
     const initial = location.name?.charAt(0)?.toUpperCase() ?? '?';
     const isParent = location.children_count > 0;
 
@@ -36,10 +36,15 @@ export default function LocationCard({ location, auth }) {
                             )}
                             {hasAnyPermissions(auth.permissions, ['location.update']) && (
                                 <DropdownMenuItem asChild>
-                                    <Link href={route('location.edit', [location])}>
+                                    <Button
+                                        variant="ghost"
+                                        className="flex w-full items-center justify-start"
+                                        as="button"
+                                        onClick={() => setEditingLocation(location)}
+                                    >
                                         <IconPencil className="mr-2 size-4" />
                                         Edit
-                                    </Link>
+                                    </Button>
                                 </DropdownMenuItem>
                             )}
                             {hasAnyPermissions(auth.permissions, ['location.delete']) && (
