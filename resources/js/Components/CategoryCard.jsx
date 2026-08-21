@@ -11,13 +11,12 @@ import hasAnyPermissions, { deleteAction } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { IconDotsVertical, IconEye, IconPencil, IconTrash } from '@tabler/icons-react';
 
-export default function LocationCard({ location, auth, setEditingLocation }) {
-    const initial = location.name?.charAt(0)?.toUpperCase() ?? '?';
-    const isParent = location.children_count > 0;
+export default function CategoryCard({ category, auth, setEditingCategory }) {
+    const initial = category.name?.charAt(0)?.toUpperCase() ?? '?';
 
     return (
         <Card className="relative mb-2">
-            {hasAnyPermissions(auth.permissions, ['location.index', 'location.update', 'location.delete']) && (
+            {hasAnyPermissions(auth.permissions, ['category.index', 'category.update', 'category.delete']) && (
                 <div className="absolute right-3 top-3">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -26,28 +25,28 @@ export default function LocationCard({ location, auth, setEditingLocation }) {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            {hasAnyPermissions(auth.permissions, ['location.index']) && (
+                            {hasAnyPermissions(auth.permissions, ['category.index']) && (
                                 <DropdownMenuItem asChild>
-                                    <Link href={route('location.show', [location.slug])}>
+                                    <Link href={route('category.show', [category.slug])}>
                                         <IconEye className="mr-2 size-4" />
                                         Lihat Detail
                                     </Link>
                                 </DropdownMenuItem>
                             )}
-                            {hasAnyPermissions(auth.permissions, ['location.update']) && (
+                            {hasAnyPermissions(auth.permissions, ['category.update']) && (
                                 <DropdownMenuItem asChild>
                                     <Button
                                         variant="ghost"
                                         className="flex w-full items-center justify-start"
                                         as="button"
-                                        onClick={() => setEditingLocation(location)}
+                                        onClick={() => setEditingCategory(category)}
                                     >
                                         <IconPencil className="mr-2 size-4" />
                                         Edit
                                     </Button>
                                 </DropdownMenuItem>
                             )}
-                            {hasAnyPermissions(auth.permissions, ['location.delete']) && (
+                            {hasAnyPermissions(auth.permissions, ['category.delete']) && (
                                 <DropdownMenuItem
                                     className="text-red-600 focus:text-red-600"
                                     onSelect={(e) => e.preventDefault()}
@@ -59,7 +58,7 @@ export default function LocationCard({ location, auth, setEditingLocation }) {
                                                 Hapus
                                             </div>
                                         }
-                                        action={() => deleteAction(route('location.destroy', [location]))}
+                                        action={() => deleteAction(route('category.destroy', [category]))}
                                     />
                                 </DropdownMenuItem>
                             )}
@@ -73,24 +72,18 @@ export default function LocationCard({ location, auth, setEditingLocation }) {
                     {initial}
                 </div>
 
-                <Link href={route('location.show', [location.slug])} className="hover:underline">
-                    <p className="text-lg font-bold">{location.name}</p>
+                <Link href={route('category.show', [category.slug])} className="hover:underline">
+                    <p className="text-lg font-bold">{category.name}</p>
                 </Link>
-
-                {isParent && (
-                    <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700">
-                        {location.children_count} sub lokasi
-                    </span>
-                )}
 
                 <div className="mt-3 flex gap-6">
                     <div>
-                        <p className="text-base font-bold">{location.tools_count}</p>
+                        <p className="text-base font-bold">{category.tools_count}</p>
                         <p className="text-xs text-muted-foreground">Tools</p>
                     </div>
                     <div>
-                        <p className="text-base font-bold">{location.total_stock}</p>
-                        <p className="text-xs text-muted-foreground">Total Stok</p>
+                        <p className="text-base font-bold">{category.toolAttributes_count}</p>
+                        <p className="text-xs text-muted-foreground">Attributes</p>
                     </div>
                 </div>
             </CardContent>

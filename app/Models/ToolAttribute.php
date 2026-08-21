@@ -8,9 +8,9 @@ class ToolAttribute extends Model
 {
     protected $guarded = [];
 
-    public function toolAttributeValues()
+    public function values()
     {
-        return $this->hasMany(ToolAttributeValue::class);
+        return $this->hasMany(ToolAttributeValue::class, 'tool_attribute_id');
     }
 
     public function category()

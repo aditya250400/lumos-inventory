@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ToolController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -37,22 +38,66 @@ Route::middleware('auth')->group(function () {
     Route::prefix('locations/{location:slug}/sub-locations')
         ->name('location.sub-locations.')
         ->group(function () {
-            Route::post('/', [LocationController::class, 'storeSubLocation'])->name('store');
+            Route::post('/', [LocationController::class, 'storeSubLocation'])
+                ->name('store');
+
             Route::get('/', function ($location) {
                 return redirect()->route('location.show', $location);
             })->name('index');
-            Route::get('/{subLocation:slug}', [LocationController::class, 'updateSubLocation'])->name('show');
-            Route::put('/{subLocation:slug}', [LocationController::class, 'updateSubLocation'])->name('update');
-            Route::delete('/{subLocation:slug}', [LocationController::class, 'destroySubLocation'])->name('destroy');
+
+            Route::get('/{subLocation:slug}', [LocationController::class, 'showSubLocation'])
+                ->name('show');
+
+            Route::get('/{subLocation:slug}/tools', [LocationController::class, 'toolsSubLocation'])
+                ->name('tools');
+
+            Route::put('/{subLocation:slug}', [LocationController::class, 'updateSubLocation'])
+                ->name('update');
+
+            Route::delete('/{subLocation:slug}', [LocationController::class, 'destroySubLocation'])
+                ->name('destroy');
         });
+
 
     // categories
     Route::controller(CategoryController::class)->group(function () {
         Route::get('categories', 'index')->name('category.index')->middleware('permission:category.index');
-        Route::get('categories/{categorie:slug}', 'show')->name('category.show');
+        Route::get('categories/{category:slug}', 'show')->name('category.show');
         Route::post('categories/create', 'store')->name('category.store')->middleware('permission:category.create');
-        Route::put('categories/edit/{categorie:slug}', 'update')->name('category.update')->middleware('permission:category.update');
-        Route::delete('categories/destroy/{categorie:slug}', 'destroy')->name('category.destroy')->middleware('permission:category.delete');
+        Route::put('categories/edit/{category:slug}', 'update')->name('category.update')->middleware('permission:category.update');
+        Route::delete('categories/destroy/{category:slug}', 'destroy')->name('category.destroy')->middleware('permission:category.delete');
+    });
+
+
+    // tools
+    Route::controller(ToolController::class)->group(function () {
+        Route::get('tools', 'index')->name('tools.index')->middleware('permission:tools.index');
+        Route::get('tools/{tool:slug}', 'show')->name('tools.show');
+        Route::post('tools/create', 'store')->name('tools.store')->middleware('permission:tools.create');
+        Route::put('tools/edit/{tool:slug}', 'update')->name('tools.update')->middleware('permission:tools.update');
+        Route::delete('tools/destroy/{tool:slug}', 'destroy')->name('tools.destroy')->middleware('permission:tools.delete');
+    });
+
+
+    // tools attribute
+    Route::controller(CategoryController::class)->group(function () {
+        Route::post(
+            'categories/{category:slug}/attributes',
+            'storeAttribute'
+        )->name('category.attributes.store')
+            ->middleware('permission:category.update');
+
+        Route::put(
+            'categories/{category:slug}/attributes/{attribute}',
+            'updateAttribute'
+        )->name('category.attributes.update')
+            ->middleware('permission:category.update');
+
+        Route::delete(
+            'categories/{category:slug}/attributes/{attribute}',
+            'destroyAttribute'
+        )->name('category.attributes.destroy')
+            ->middleware('permission:category.delete');
     });
 });
 

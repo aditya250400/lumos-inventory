@@ -1,7 +1,6 @@
 import AlertAction from '@/Components/AlertAction';
 import EmptyState from '@/Components/EmptyState';
 import HeaderTitle from '@/Components/HeaderTitle';
-import LocationCard from '@/Components/LocationCard';
 import PaginationTable from '@/Components/PaginationTable';
 import ShowFilter from '@/Components/ShowFilter';
 import { Button } from '@/Components/ui/button';
@@ -15,8 +14,8 @@ import hasAnyPermissions, { deleteAction, formatDateIndo } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import {
     IconArrowsDownUp,
+    IconCategory2,
     IconDoor,
-    IconLocation,
     IconLocationSearch,
     IconPencil,
     IconPlus,
@@ -24,17 +23,18 @@ import {
     IconTrash,
 } from '@tabler/icons-react';
 import { useState } from 'react';
-import CreateLocationModal from './CreateLocationModal';
-import EditLocationModal from './EditLocationModal';
+import CreateCategoryModal from './CreateCategoryModal';
+import EditCategoryModal from './EditCategoryModal';
 import ViewSwitcher from '@/Components/ViewSwitcher';
 import useViewMode from '@/hooks/UseViewMode';
+import CategoryCard from '@/Components/CategoryCard';
 
 export default function Index(props) {
-    const { data: locations, meta, links } = props.locations;
+    const { data: categories, meta, links } = props.categories;
     const [params, setParams] = useState(props.state);
     const [createOpen, setCreateOpen] = useState(false);
-    const [view, setView] = useViewMode('location-index-view', 'card');
-    const [editingLocation, setEditingLocation] = useState(null);
+    const [view, setView] = useViewMode('category-index-view', 'card');
+    const [editingCategory, setEditingCategory] = useState(null);
 
     const onSortable = (field) => {
         setParams({
@@ -45,9 +45,9 @@ export default function Index(props) {
     };
 
     UseFilter({
-        route: route('location.index'),
+        route: route('category.index'),
         values: params,
-        only: ['locations'],
+        only: ['categories'],
     });
 
     return (
@@ -57,9 +57,9 @@ export default function Index(props) {
                     <HeaderTitle
                         title={props.page_settings.title}
                         subtitle={props.page_settings.subtitle}
-                        icon={IconLocation}
+                        icon={IconCategory2}
                     />
-                    {hasAnyPermissions(props.auth.permissions, ['location.create']) && (
+                    {hasAnyPermissions(props.auth.permissions, ['category.create']) && (
                         <Button
                             variant="blue"
                             size="xl"
@@ -107,31 +107,31 @@ export default function Index(props) {
                     </CardHeader>
 
                     <CardContent className="[&-td]: p-0 [&-td]:whitespace-nowrap [&-th]:px-6">
-                        {locations.length === 0 ? (
+                        {categories.length === 0 ? (
                             <EmptyState
                                 icon={IconDoor}
-                                title="Tidak ada lokasi"
-                                subtitle="Mulailah dengan membuat lokasi baru"
+                                title="Tidak ada kategori tools"
+                                subtitle="Mulailah dengan membuat kategori tools baru"
                             />
                         ) : view === 'card' ? (
                             <div className="grid grid-cols-1 gap-4 px-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                {locations.map((location) => (
-                                    <LocationCard
-                                        setEditingLocation={setEditingLocation}
-                                        key={location.id}
-                                        location={location}
+                                {categories.map((category) => (
+                                    <CategoryCard
+                                        setEditingCategory={setEditingCategory}
+                                        key={category.id}
+                                        category={category}
                                         auth={props.auth}
                                     />
                                 ))}
 
-                                {hasAnyPermissions(props.auth.permissions, ['location.create']) && (
+                                {hasAnyPermissions(props.auth.permissions, ['category.create']) && (
                                     <button
                                         type="button"
                                         className="mb-2 text-left"
                                         onClick={() => setCreateOpen(true)}
                                     >
                                         <Card className="flex h-full min-h-[150px] items-center justify-center border-dashed text-muted-foreground hover:bg-muted/40">
-                                            <p className="text-sm">+ Lokasi Baru</p>
+                                            <p className="text-sm">+ kategori tools Baru</p>
                                         </Card>
                                     </button>
                                 )}
@@ -158,32 +158,35 @@ export default function Index(props) {
                                                 className="group inline-flex"
                                                 onClick={() => onSortable('name')}
                                             >
-                                                Lokasi
+                                                kategori tools
                                                 <span className="ml-2 flex-none rounded text-muted-foreground">
                                                     <IconArrowsDownUp className="size-4" />
                                                 </span>
-                                            </Button>
-                                        </TableHead>
-                                        <TableHead>
-                                            <Button variant="ghost" className="group inline-flex">
-                                                Total Subs Lokasi
                                             </Button>
                                         </TableHead>
                                         <TableHead>
                                             <Button
-                                                onClick={() => onSortable('total_tools')}
+                                                onClick={() => onSortable('tools_count')}
                                                 variant="ghost"
                                                 className="group inline-flex"
                                             >
-                                                Total Tool
+                                                Total tools
                                                 <span className="ml-2 flex-none rounded text-muted-foreground">
                                                     <IconArrowsDownUp className="size-4" />
                                                 </span>
                                             </Button>
                                         </TableHead>
                                         <TableHead>
-                                            <Button variant="ghost" className="group inline-flex">
-                                                Total Stok
+                                            <Button
+                                                onClick={() => onSortable('tool_attributes_count')}
+
+                                                variant="ghost"
+                                                className="group inline-flex"
+                                            >
+                                                Total Attribute
+                                                <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                    <IconArrowsDownUp className="size-4" />
+                                                </span>
                                             </Button>
                                         </TableHead>
 
@@ -200,40 +203,39 @@ export default function Index(props) {
                                             </Button>
                                         </TableHead>
                                         {hasAnyPermissions(props.auth.permissions, [
-                                            'location.update',
-                                            'location.delete',
+                                            'category.update',
+                                            'category.delete',
                                         ]) && <TableHead>Aksi</TableHead>}
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody className="text-center">
-                                    {locations.map((location, index) => (
+                                    {categories.map((category, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{index + 1 + (meta.current_page - 1) * meta.per_page}</TableCell>
-                                            <TableCell>{location.name}</TableCell>
-                                            <TableCell>{location.children_count}</TableCell>
-                                            <TableCell>{location.tools_count}</TableCell>
-                                            <TableCell>{location.total_stock}</TableCell>
+                                            <TableCell>{category.name}</TableCell>
+                                            <TableCell>{category.tools_count}</TableCell>
+                                            <TableCell>{category.toolAttributes_count}</TableCell>
 
-                                            <TableCell>{formatDateIndo(location.created_at)}</TableCell>
+                                            <TableCell>{formatDateIndo(category.created_at)}</TableCell>
 
                                             {hasAnyPermissions(props.auth.permissions, [
-                                                'location',
-                                                'location.update',
-                                                'location.delete',
+                                                'category',
+                                                'category.update',
+                                                'category.delete',
                                             ]) && (
                                                 <TableCell>
                                                     <div className="flex items-center gap-x-1">
                                                         <Button variant="purple" size="sm" asChild>
-                                                            <Link href={route('location.show', [location.slug])}>
+                                                            <Link href={route('category.show', [category.slug])}>
                                                                 <IconLocationSearch size="4" />
-                                                                Lihat Lokasi
+                                                                Lihat detail kategori
                                                             </Link>
                                                         </Button>
                                                         {hasAnyPermissions(props.auth.permissions, [
-                                                            'location.update',
+                                                            'category.update',
                                                         ]) && (
                                                             <Button
-                                                                onClick={() => setEditingLocation(location)}
+                                                                onClick={() => setEditingCategory(category)}
                                                                 variant="blue"
                                                                 size="sm"
                                                             >
@@ -242,7 +244,7 @@ export default function Index(props) {
                                                             </Button>
                                                         )}
                                                         {hasAnyPermissions(props.auth.permissions, [
-                                                            'location.delete',
+                                                            'category.delete',
                                                         ]) && (
                                                             <AlertAction
                                                                 trigger={
@@ -252,7 +254,7 @@ export default function Index(props) {
                                                                     </Button>
                                                                 }
                                                                 action={() =>
-                                                                    deleteAction(route('location.destroy', [location]))
+                                                                    deleteAction(route('category.destroy', [category]))
                                                                 }
                                                             />
                                                         )}
@@ -268,7 +270,7 @@ export default function Index(props) {
                     <CardFooter className="flex w-full flex-col items-center justify-between gap-y-2 border-t py-3 lg:flex-row">
                         <p className="text-sm text-muted-foreground">
                             Menampilkan <span className="font-medium text-blue-600">{meta.to ?? 0}</span> dari{' '}
-                            {meta.total} Lokasi
+                            {meta.total} kategori tools
                         </p>
                         <div className="overflow-x-auto">
                             {meta.has_pages && <PaginationTable meta={meta} links={links} />}
@@ -277,18 +279,17 @@ export default function Index(props) {
                 </Card>
             </div>
 
-            <CreateLocationModal
+            <CreateCategoryModal
                 users={props.users}
                 action={props.page_settings.action}
                 method={props.page_settings.method}
                 open={createOpen}
                 onOpenChange={setCreateOpen}
             />
-            <EditLocationModal
-                open={editingLocation !== null}
-                onOpenChange={(isOpen) => !isOpen && setEditingLocation(null)}
-                location={editingLocation}
-                users={props.users}
+            <EditCategoryModal
+                open={editingCategory !== null}
+                onOpenChange={(isOpen) => !isOpen && setEditingCategory(null)}
+                category={editingCategory}
                 method="PUT"
             />
         </>
