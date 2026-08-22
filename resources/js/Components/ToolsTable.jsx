@@ -7,7 +7,15 @@ import hasAnyPermissions, { deleteAction, formatDateIndo } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { IconArrowsDownUp, IconTrash } from '@tabler/icons-react';
 
-export default function ToolsTable({ tools, meta, auth, onSortable, dynamicColumns = [], showCategory = false }) {
+export default function ToolsTable({
+    tools,
+    meta,
+    auth,
+    onSortable,
+    dynamicColumns = [],
+    showCategory = false,
+    showNote = false,
+}) {
     return (
         <Table className="w-full">
             <TableHeader>
@@ -47,7 +55,8 @@ export default function ToolsTable({ tools, meta, auth, onSortable, dynamicColum
                             {column}
                         </TableHead>
                     ))}
-
+                    {/* Optional: note */}
+                    {showNote && <TableHead>Catatan</TableHead>}
                     <TableHead>Dibuat Pada</TableHead>
                     <TableHead>Aksi</TableHead>
                 </TableRow>
@@ -95,6 +104,9 @@ export default function ToolsTable({ tools, meta, auth, onSortable, dynamicColum
                                 {tool.attributes?.[column] ?? '-'}
                             </TableCell>
                         ))}
+
+                        {/* Optional: kategori */}
+                        {showNote && <TableCell>{tool?.note ?? '-'}</TableCell>}
 
                         <TableCell>{formatDateIndo(tool.created_at)}</TableCell>
 

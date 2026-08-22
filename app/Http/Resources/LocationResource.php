@@ -24,6 +24,12 @@ class LocationResource extends JsonResource
             'tools_parent_count' => $this->tools_count,
             'children_count' => $this->children_count,
             'is_parent' => $this->children_count > 0,
+            'user' => $this->whenLoaded('user', function () {
+                return [
+                    'id' => $this->user->id,
+                    'name' => $this->user->name,
+                ];
+            }),
             'total_stock' => ($this->tools_sum_stock ?? 0)
                 + $this->children->sum('tools_sum_stock'),
             'parent' => $this->whenLoaded('parent', function () {

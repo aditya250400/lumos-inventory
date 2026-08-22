@@ -27,6 +27,12 @@ class ToolsResource extends JsonResource
                         : null,
                 ];
             }),
+            'category' => $this->whenLoaded('category', function () {
+                return [
+                    'id' => $this->category->id,
+                    'name' => $this->category->name,
+                ];
+            }),
             'used_by' => $this->whenLoaded('usedBy', function () {
                 return [
                     'id' => $this->usedBy->id,

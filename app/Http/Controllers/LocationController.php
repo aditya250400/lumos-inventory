@@ -6,6 +6,7 @@ use App\Enums\MessageType;
 use App\Http\Requests\LocationRequest;
 use App\Http\Requests\SubLocationRequest;
 use App\Http\Resources\LocationResource;
+use App\Http\Resources\ToolsResource;
 use App\Models\Location;
 use App\Models\Tool;
 use App\Models\User;
@@ -23,6 +24,7 @@ class LocationController extends Controller
             ->withCount(['tools', 'children'])
             ->withSum('tools', 'stock')
             ->with([
+                'user',
                 'children' => function ($query) {
                     $query
                         ->withCount('tools')
@@ -101,7 +103,9 @@ class LocationController extends Controller
             ->loadSum('tools', 'stock');
 
         $location->load(['children' => function ($query) {
-            $query->withCount('tools')
+            $query
+                ->with(['user'])
+                ->withCount('tools')
                 ->withSum('tools', 'stock')
                 ->orderBy('tools_count', 'desc');
         }]);
@@ -123,12 +127,13 @@ class LocationController extends Controller
                 'total_tools' => $totalToolsAll,
                 'total_stock' => $totalStockAll,
                 'tools_parent_count' => $location->tools_count,
-                'tools_parent_stock' => $location->tools_sum_stock,
+                'tools_parent_stock' => $location->tools_sum_stock ?? 0,
                 'children' => $location->children->map(fn($child) => [
                     'id' => $child->id,
                     'name' => $child->name,
                     'slug' => $child->slug,
                     'user_id' => $child->user_id,
+                    'user' => $child->user,
                     'tools_count' => $child->tools_count,
                     'total_stock' => $child->tools_sum_stock ?? 0,
                 ]),
@@ -260,6 +265,8 @@ class LocationController extends Controller
         }
     }
 
+
+
     // subs location
     // ================= Sub-lokasi (nested resource di bawah location) =================
 
@@ -316,5 +323,165 @@ class LocationController extends Controller
             flashMessage(MessageType::ERROR->message(error: $e->getMessage()), 'error');
             return to_route('location.show', $location->slug);
         }
+    }
+
+
+
+    // tools subs locations
+
+    public function toolsSubLocation(Location $location, Location $subLocation)
+    {
+
+        $subLocation->loadCount(['tools', 'children'])
+            ->loadSum('tools', 'stock');
+
+        $subLocation->load(['parent', 'user']);
+
+        $tools = Tool::filter(request()->only(['search']))
+            ->sorting(request()->only(['field', 'direction']))
+            ->where('location_id', $subLocation->id)
+            ->with(['category', 'location' => fn($query) => $query->with('parent'), 'images', 'attributeValues.attribute', 'usedBy'])
+            ->paginate(request()->load ?? 10);
+
+        return inertia('Location/SubLocationTool', [
+            'page_settings' => [
+                'title' => $subLocation->name,
+                'subtitle' => "Detail subs lokasi dari {$subLocation->name}",
+            ],
+            'location' => $location,
+            'tools' => ToolsResource::collection($tools)->additional([
+                'meta' => [
+                    'has_pages' => $tools->hasPages(),
+                ],
+            ]),
+            'subLocation' => [
+                'id' => $subLocation->id,
+                'name' => $subLocation->name,
+                'slug' => $subLocation->slug,
+                'user' => $subLocation->user,
+                'tools_count' => $subLocation->tools_count,
+                'total_stock' => $subLocation->tools_sum_stock ?? 0,
+                'parent' => $subLocation->parent ? [
+                    'id' => $subLocation->parent->id,
+                    'name' => $subLocation->parent->name,
+                    'slug' => $subLocation->parent->slug,
+                    'tools_count' => $subLocation->parent->tools_count,
+                    'total_stock' => $subLocation->parent->tools_sum_stock ?? 0,
+                ] : null,
+            ],
+            'state' => [
+                'page' => request()->page ?? 1,
+                'search' => request()->search ?? '',
+                'load' => 10
+            ],
+        ]);
+    }
+
+    public function locationToolsIndex(Request $request, Location $location)
+    {
+        $scope = $request->input('scope', 'all');
+
+        /*
+     * ============================================================
+     * LOCATION IDS
+     * ============================================================
+     *
+     * direct = hanya location ini
+     * all    = location ini + seluruh child
+     */
+        $locationIds = collect([$location->id]);
+
+        if ($scope !== 'direct') {
+            $children = $location->children()
+                ->with('children')
+                ->get();
+
+            $collectChildren = function ($locations) use (&$collectChildren, &$locationIds) {
+                foreach ($locations as $child) {
+                    $locationIds->push($child->id);
+
+                    if ($child->children->isNotEmpty()) {
+                        $collectChildren($child->children);
+                    }
+                }
+            };
+
+            $collectChildren($children);
+        }
+
+        $locationIds = $locationIds->unique()->values();
+
+        /*
+     * ============================================================
+     * TOOLS QUERY
+     * ============================================================
+     */
+        $query = Tool::query()
+            ->whereIn('location_id', $locationIds);
+
+        $tools = $query
+            ->filter($request->only(['search']))
+            ->sorting($request->only(['field', 'direction']))
+            ->with([
+                'category',
+                'location' => fn($locationQuery) => $locationQuery->with('parent'),
+                'images',
+                'attributeValues.attribute',
+                'usedBy',
+            ])
+            ->paginate($request->input('load', 10))
+            ->withQueryString();
+
+        /*
+     * ============================================================
+     * STATISTICS
+     * ============================================================
+     *
+     * Menggunakan locationIds yang sama dengan tools.
+     *
+     * direct:
+     *   hanya tools location ini
+     *
+     * all:
+     *   tools location ini + seluruh child
+     */
+        $totalTools = Tool::query()
+            ->whereIn('location_id', $locationIds)
+            ->count();
+
+        $totalStock = Tool::query()
+            ->whereIn('location_id', $locationIds)
+            ->sum('stock');
+
+        return inertia('Location/LocationTool', [
+            'page_settings' => [
+                'title' => $location->name,
+                'subtitle' => $scope === 'direct'
+                    ? "Tools langsung di {$location->name}"
+                    : "Semua tools di {$location->name} dan seluruh sub lokasinya",
+            ],
+
+            'location' => [
+                'id' => $location->id,
+                'name' => $location->name,
+                'slug' => $location->slug,
+                'user' => $location->user,
+                'tools_count' => $totalTools,
+                'total_stock' => $totalStock,
+            ],
+
+            'tools' => ToolsResource::collection($tools)->additional([
+                'meta' => [
+                    'has_pages' => $tools->hasPages(),
+                ],
+            ]),
+
+            'state' => [
+                'page' => $request->input('page', 1),
+                'search' => $request->input('search', ''),
+                'load' => $request->input('load', 10),
+                'scope' => $scope,
+            ],
+        ]);
     }
 }

@@ -52,6 +52,35 @@ class Tool extends Model
         });
     }
 
+    public function scopeFilters(Builder $query, $filters)
+    {
+        $query
+            ->when($filters['category'] ?? null, function ($query, $categorySlug) {
+                $query->whereHas('category', function ($query) use ($categorySlug) {
+                    $query->where('slug', $categorySlug);
+                });
+            })
+
+            ->when($filters['location'] ?? null, function ($query, $locationSlug) {
+                $query->whereHas('location', function ($query) use ($locationSlug) {
+                    $query->where('slug', $locationSlug);
+                });
+            })
+
+            ->when($filters['status'] ?? null, function ($query, $status) {
+                $query->where('status', $status);
+            })
+
+            ->when($filters['inventory_type'] ?? null, function ($query, $inventoryType) {
+                $query->where('inventory_type', $inventoryType);
+            })
+
+            ->when($filters['used_by'] ?? null, function ($query, $userId) {
+                $query->where('used_by', $userId);
+            });
+    }
+
+
     public function scopeSorting(Builder $query, $sorts)
     {
         $query->when($sorts['field'] ?? null && $sorts['direction'] ?? null, function ($query) use ($sorts) {

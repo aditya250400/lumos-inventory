@@ -1,0 +1,191 @@
+import AlertAction from '@/Components/AlertAction';
+import EmptyState from '@/Components/EmptyState';
+import HeaderTitle from '@/Components/HeaderTitle';
+import PaginationTable from '@/Components/PaginationTable';
+import ShowFilter from '@/Components/ShowFilter';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/Components/ui/card';
+import { Input } from '@/Components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import UseFilter from '@/hooks/UseFilter';
+import AppLayout from '@/Layouts/AppLayout';
+import hasAnyPermissions, { deleteAction, formatDateIndo } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
+import {
+    IconArrowsDownUp,
+    IconCategory2,
+    IconDoor,
+    IconFilter,
+    IconLocationSearch,
+    IconPencil,
+    IconPlus,
+    IconRefresh,
+    IconTrash,
+} from '@tabler/icons-react';
+import { useState } from 'react';
+import ViewSwitcher from '@/Components/ViewSwitcher';
+import useViewMode from '@/hooks/UseViewMode';
+import CategoryCard from '@/Components/CategoryCard';
+import EditCategoryModal from '../Category/EditCategoryModal';
+import CreateCategoryModal from '../Category/CreateCategoryModal';
+import ToolsTable from '@/Components/ToolsTable';
+import ToolsFilterModal from '@/Components/ToolsFilterModal';
+import ToolCard from '@/Components/ToolCard';
+
+export default function Index(props) {
+    const { data: tools, meta: toolsMeta, links: toolsLinks } = props.tools;
+    const [params, setParams] = useState(props.state);
+    const [createOpen, setCreateOpen] = useState(false);
+    const [view, setView] = useViewMode('tools-index-view', 'card');
+    const [editingCategory, setEditingCategory] = useState(null);
+    const [filterOpen, setFilterOpen] = useState(false);
+
+    const onSortable = (field) => {
+        setParams({
+            ...params,
+            field: field,
+            direction: params.direction === 'asc' ? 'desc' : 'asc',
+        });
+    };
+
+    UseFilter({
+        route: route('tools.index'),
+        values: params,
+        only: ['tools'],
+    });
+
+    return (
+        <>
+            <div className="flex w-full flex-col pb-32">
+                <div className="mb-8 flex flex-col items-start justify-between gap-y-4 lg:flex-row lg:items-center">
+                    <HeaderTitle
+                        title={props.page_settings.title}
+                        subtitle={props.page_settings.subtitle}
+                        icon={IconCategory2}
+                    />
+                    {hasAnyPermissions(props.auth.permissions, ['tools.create']) && (
+                        <Button
+                            variant="blue"
+                            size="xl"
+                            className="w-full lg:w-auto"
+                            onClick={() => setCreateOpen(true)}
+                        >
+                            <IconPlus className="size-4" /> Tambah
+                        </Button>
+                    )}
+                </div>
+                <Card>
+                    <CardHeader className={'mb-4 p-0'}>
+                        <div className="flex w-full flex-col gap-4 px-6 py-4 lg:flex-row lg:items-center">
+                            <div className="flex w-full flex-col gap-2 lg:flex-row lg:items-center">
+                                <Input
+                                    size="sm"
+
+                                    className="w-full lg:w-1/4"
+                                    placeholder="search"
+                                    value={params?.search}
+                                    onChange={(e) =>
+                                        setParams((prev) => ({
+                                            ...prev,
+                                            search: e.target.value,
+                                        }))
+                                    }
+                                />
+
+                                <Select
+                                    value={params?.load}
+                                    size="sm"
+                                    onValueChange={(e) =>
+                                        setParams({
+                                            ...params,
+                                            load: e,
+                                        })
+                                    }
+                                >
+                                    <SelectTrigger className="w-full lg:w-24">
+                                        <SelectValue placeholder="Load" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        {[15, 25, 50, 75, 100].map((number, index) => (
+                                            <SelectItem key={index} value={number}>
+                                                {number}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <ToolsFilterModal
+                                    params={params}
+                                    onApply={setParams}
+                                    onClear={setParams}
+                                    categories={props.categories}
+                                    locations={props.locations}
+                                    users={props.users}
+                                    statuses={props.statuses}
+                                    inventory_types={props.inventory_types}
+                                />
+                            </div>
+
+                            <ViewSwitcher value={view} onChange={setView} />
+                        </div>
+                        {/* show filter */}
+                        <ShowFilter params={params} />
+                    </CardHeader>
+                    <CardContent className="[&-td]:whitespace-nowrap [&-td]:p-0 [&-th]:px-6">
+                        {tools.length === 0 ? (
+                            <EmptyState
+                                icon={IconDoor}
+                                title="Belum ada tools"
+                                subtitle={`Belum ada tools, mulailah dengan membuat tools baru`}
+                            />
+                        ) : view === 'card' ? (
+                            <div className="grid grid-cols-1 gap-4 px-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                {tools.map((tool) => (
+                                    <ToolCard key={tool.id} tool={tool} auth={props.auth} />
+                                ))}
+                            </div>
+                        ) : (
+                            <ToolsTable
+                                tools={tools}
+                                meta={toolsMeta}
+                                auth={props.auth}
+                                onSortable={onSortable}
+                                showNote={true}
+                                showCategory={true}
+                            />
+                        )}
+                    </CardContent>
+
+                    <CardFooter className="flex w-full flex-col items-center justify-between gap-y-2 border-t py-3 lg:flex-row">
+                        <p className="text-sm text-muted-foreground">
+                            Menampilkan <span className="font-medium text-blue-600">{toolsMeta.to ?? 0}</span> dari{' '}
+                            {toolsMeta.total} tools
+                        </p>
+
+                        <div className="overflow-x-auto">
+                            {toolsMeta.has_pages && <PaginationTable meta={toolsMeta} links={toolsLinks} />}
+                        </div>
+                    </CardFooter>
+                </Card>
+            </div>
+
+            <CreateCategoryModal
+                users={props.users}
+                action={props.page_settings.action}
+                method={props.page_settings.method}
+                open={createOpen}
+                onOpenChange={setCreateOpen}
+            />
+            <EditCategoryModal
+                open={editingCategory !== null}
+                onOpenChange={(isOpen) => !isOpen && setEditingCategory(null)}
+                category={editingCategory}
+                method="PUT"
+            />
+        </>
+    );
+}
+
+Index.layout = (page) => <AppLayout children={page} title={page.props.page_settings.title} />;

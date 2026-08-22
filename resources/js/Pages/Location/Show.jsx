@@ -27,6 +27,7 @@ export default function Show({ auth, location, users }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingSub, setEditingSub] = useState(null); // null = mode tambah
 
+    console.log(location);
     const openCreate = () => {
         setEditingSub(null);
         setModalOpen(true);
@@ -89,15 +90,55 @@ export default function Show({ auth, location, users }) {
 
                     <Card>
                         <CardContent className="pt-6">
-                            <p className="font-bold">Lokasi ini ({location.name})</p>
-                            <p className="mt-2 text-sm text-muted-foreground">
-                                {location.tools_parent_count} tools . {location.tools_parent_stock} stok
-                            </p>
+                            <Link
+                                href={route('location.tools.index', [location.slug])}
+                                className="block text-lg font-bold hover:text-blue-600 hover:underline"
+                            >
+                                Semua Tools {location.name}
+                            </Link>
+
+                            {/* Statistik */}
+                            <div className="mt-4 flex gap-8">
+                                <div>
+                                    <p className="text-base font-bold">{location.total_tools}</p>
+                                    <p className="text-xs text-muted-foreground">Tools</p>
+                                </div>
+
+                                <div>
+                                    <p className="text-base font-bold">{location.total_stock}</p>
+                                    <p className="text-xs text-muted-foreground">Total Stok</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardContent className="pt-6">
+                            <Link
+                                href={route('location.tools.index', [location.slug]) + '?scope=direct'}
+                                className="block text-lg font-bold hover:text-blue-600 hover:underline"
+                            >
+                                Lokasi ini ({location.name})
+                            </Link>
+
+                            {/* Statistik */}
+                            <div className="mt-4 flex gap-8">
+                                <div>
+                                    <p className="text-base font-bold">{location.tools_parent_count}</p>
+                                    <p className="text-xs text-muted-foreground">Tools</p>
+                                </div>
+
+                                <div>
+                                    <p className="text-base font-bold">{location.tools_parent_stock}</p>
+                                    <p className="text-xs text-muted-foreground">Total Stok</p>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
 
                     {location.children.map((sub) => (
-                        <Card key={sub.id} className="relative">
+                        <Card key={sub.id} className="relative transition-colors hover:border-blue-300">
+                            {/* Actions */}
                             {hasAnyPermissions(auth.permissions, ['location.update', 'location.delete']) && (
                                 <div className="absolute right-3 top-3">
                                     <DropdownMenu>
@@ -106,26 +147,15 @@ export default function Show({ auth, location, users }) {
                                                 <IconDotsVertical className="size-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
+
                                         <DropdownMenuContent align="end">
-                                            {hasAnyPermissions(auth.permissions, ['location.index']) && (
-                                                <DropdownMenuItem asChild>
-                                                    <Link
-                                                        href={route('location.sub-locations.show', [
-                                                            location.slug,
-                                                            sub.slug,
-                                                        ])}
-                                                    >
-                                                        <IconEye className="mr-2 size-4" />
-                                                        Lihat Detail
-                                                    </Link>
-                                                </DropdownMenuItem>
-                                            )}
                                             {hasAnyPermissions(auth.permissions, ['location.update']) && (
                                                 <DropdownMenuItem onSelect={() => openEdit(sub)}>
                                                     <IconPencil className="mr-2 size-4" />
                                                     Edit
                                                 </DropdownMenuItem>
                                             )}
+
                                             {hasAnyPermissions(auth.permissions, ['location.delete']) && (
                                                 <DropdownMenuItem
                                                     className="text-red-600 focus:text-red-600"
@@ -155,15 +185,31 @@ export default function Show({ auth, location, users }) {
                             )}
 
                             <CardContent className="pt-6">
+                                {/* Nama sub-lokasi */}
                                 <Link
-                                    href={route('location.sub-locations.show', [location.slug, sub.slug])}
-                                    className="font-bold"
+                                    href={route('location.sub-locations.tools.index', [location.slug, sub.slug])}
+                                    className="block pr-8 text-lg font-bold hover:text-blue-600 hover:underline"
                                 >
                                     {sub.name}
                                 </Link>
-                                <p className="mt-2 text-sm text-muted-foreground">
-                                    {sub.tools_count} tools . {sub.total_stock} stok
-                                </p>
+
+                                {/* Pemilik */}
+                                {sub.user?.name && (
+                                    <p className="mt-1 text-sm text-muted-foreground">Pemilik: {sub.user.name}</p>
+                                )}
+
+                                {/* Statistik */}
+                                <div className="mt-4 flex gap-8">
+                                    <div>
+                                        <p className="text-base font-bold">{sub.tools_count}</p>
+                                        <p className="text-xs text-muted-foreground">Tools</p>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-base font-bold">{sub.total_stock}</p>
+                                        <p className="text-xs text-muted-foreground">Total Stok</p>
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
                     ))}

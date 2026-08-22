@@ -13,6 +13,7 @@ import {
     IconPrinter,
     IconPencilCheck,
     IconShieldCode,
+    IconTagPlus,
 } from '@tabler/icons-react';
 
 export default function SidebarResponsive({ auth, url }) {
@@ -48,7 +49,7 @@ export default function SidebarResponsive({ auth, url }) {
                 <div className="px-3 py-2 text-base font-medium text-white">Aktivitas</div>
 
                 <NavLink url="#" title="Stock Opname" icon={IconPencilCheck} />
-
+                <NavLink url="#" title="Peminjaman" icon={IconTagPlus} />
                 <NavLink url="#" title="Laporan" icon={IconFileText} />
                 <NavLink url="#" title="Cetak Dokumen" icon={IconPrinter} />
 
@@ -67,7 +68,7 @@ export default function SidebarResponsive({ auth, url }) {
                     title="Kategori Tools"
                     icon={IconCategory2}
                 />
-                <NavLink url={'#'} active={url.startsWith('/tools')} title="Tools" icon={IconTools} />
+                <NavLink url={route('tools.index')} active={url.startsWith('/tools')} title="Tools" icon={IconTools} />
                 <NavLink url={'#'} active={url.startsWith('/roles')} title="Roles" icon={IconShieldCode} />
                 <NavLink url={'#'} active={url.startsWith('/users')} title="Pengguna" icon={IconUsers} />
 

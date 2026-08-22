@@ -8,7 +8,7 @@ export default function ViewSwitcher({ value, onChange }) {
                 type="button"
                 size="sm"
                 variant={value === 'card' ? 'blue' : 'ghost'}
-                className="gap-1.5"
+                className="w-full gap-1.5 lg:w-fit"
                 onClick={() => onChange('card')}
             >
                 <IconLayoutGrid className="size-4" />
@@ -19,7 +19,7 @@ export default function ViewSwitcher({ value, onChange }) {
                 type="button"
                 size="sm"
                 variant={value === 'table' ? 'blue' : 'ghost'}
-                className="gap-1.5"
+                className="w-full gap-1.5 lg:w-fit"
                 onClick={() => onChange('table')}
             >
                 <IconTable className="size-4" />

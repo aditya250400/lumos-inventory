@@ -259,6 +259,7 @@ export default function Show({ auth, category, tools: toolsProp, attributes, sta
                                     meta={toolsMeta}
                                     auth={auth}
                                     onSortable={onSortable}
+                                    showNote={true}
                                     dynamicColumns={dynamicColumns}
                                 />
                             )

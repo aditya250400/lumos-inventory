@@ -28,7 +28,8 @@ Route::middleware('auth')->group(function () {
     // locations
     Route::controller(LocationController::class)->group(function () {
         Route::get('locations', 'index')->name('location.index')->middleware('permission:location.index');
-        Route::get('locations/{location:slug}', 'show')->name('location.show');
+        Route::get('locations/{location:slug}', 'show')->name('location.show')->middleware('permission:tools.index');
+        Route::get('locations/{location:slug}/tools', 'locationToolsIndex')->name('location.tools.index');
         Route::post('locations/create', 'store')->name('location.store')->middleware('permission:location.create');
         Route::put('locations/edit/{location:slug}', 'update')->name('location.update')->middleware('permission:location.update');
         Route::delete('locations/destroy/{location:slug}', 'destroy')->name('location.destroy')->middleware('permission:location.delete');
@@ -40,7 +41,8 @@ Route::middleware('auth')->group(function () {
         ->group(function () {
             Route::post('/', [LocationController::class, 'storeSubLocation'])
                 ->name('store');
-
+            Route::get('/{subLocation:slug}/tools', [LocationController::class, 'toolsSubLocation'])
+                ->name('tools.index');
             Route::get('/', function ($location) {
                 return redirect()->route('location.show', $location);
             })->name('index');
@@ -48,8 +50,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{subLocation:slug}', [LocationController::class, 'showSubLocation'])
                 ->name('show');
 
-            Route::get('/{subLocation:slug}/tools', [LocationController::class, 'toolsSubLocation'])
-                ->name('tools');
+
 
             Route::put('/{subLocation:slug}', [LocationController::class, 'updateSubLocation'])
                 ->name('update');
