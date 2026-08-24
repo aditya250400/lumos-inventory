@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\InventoryTypeEnum;
 use App\Enums\MessageType;
+use App\Enums\ToolEnum;
 use App\Http\Requests\LocationRequest;
 use App\Http\Requests\SubLocationRequest;
 use App\Http\Resources\LocationResource;
 use App\Http\Resources\ToolsResource;
+use App\Models\Category;
 use App\Models\Location;
 use App\Models\Tool;
 use App\Models\User;
@@ -348,6 +351,32 @@ class LocationController extends Controller
                 'title' => $subLocation->name,
                 'subtitle' => "Detail subs lokasi dari {$subLocation->name}",
             ],
+            'categories' => Category::query()
+                ->select(['id', 'name', 'slug'])
+                ->with([
+                    'attributes' => fn($query) => $query
+                        ->select(['id', 'category_id', 'field_name'])
+                        ->orderBy('field_name'),
+                ])
+                ->orderBy('name')
+                ->get(),
+
+
+            'locations' => Location::query()
+                ->select(['id', 'name', 'slug', 'parent_id'])
+                ->with([
+                    'parent:id,name,slug',
+                ])
+                ->orderBy('name')
+                ->get(),
+
+
+            'users' => User::query()
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get(),
+            'statuses' => ToolEnum::options(),
+            'inventory_types' => InventoryTypeEnum::options(),
             'location' => $location,
             'tools' => ToolsResource::collection($tools)->additional([
                 'meta' => [

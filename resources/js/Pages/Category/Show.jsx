@@ -71,9 +71,9 @@ export default function Show(
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editingAtt, setEditingAtt] = useState(null);
-    const [createOpen, setCreateOpen] = useState(false);
     const [view, setView] = useViewMode('category-detail-tools-view', 'table');
     const [params, setParams] = useState(state);
+    const [createOpen, setCreateOpen] = useState(false);
     const [selectedTool, setSelectedTool] = useState(null);
     const [editOpen, setEditOpen] = useState(false);
 

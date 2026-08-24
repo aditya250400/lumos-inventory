@@ -22,12 +22,14 @@ import {
 import { useState } from 'react';
 import SubLocationModal from './SubLocationModal';
 import HeaderTitle from '@/Components/HeaderTitle';
+import AttributeModal from '../Category/AttributeModal';
+import EditToolModal from '@/Components/EditToolModal';
+import CreateToolModal from '@/Components/CreateToolModal';
 
 export default function Show({ auth, location, users }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingSub, setEditingSub] = useState(null); // null = mode tambah
 
-    console.log(location);
     const openCreate = () => {
         setEditingSub(null);
         setModalOpen(true);

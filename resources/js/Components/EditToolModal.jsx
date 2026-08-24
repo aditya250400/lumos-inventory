@@ -39,7 +39,7 @@ export default function EditToolModal({
     inventory_types,
     statuses,
     lockCategory = null,
-    locklocation = null,
+    lockLocation = null,
 }) {
     const textDraftKey = tool ? `tool-draft-edit-${tool.id}` : null;
     const imageDraftKey = tool ? `tool-draft-edit-${tool.id}` : null;
@@ -402,7 +402,7 @@ export default function EditToolModal({
                                     INVENTORY_TYPE_OPTIONS={inventory_types}
                                     STATUS_OPTIONS={statuses}
                                     lockCategory={lockCategory}
-                                    lockLocation={null}
+                                    lockLocation={lockLocation}
                                     images={images}
                                     onAddImages={handleAddImages}
                                     onRemoveImage={handleRemoveImage}
