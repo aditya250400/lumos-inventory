@@ -489,7 +489,32 @@ class LocationController extends Controller
                     ? "Tools langsung di {$location->name}"
                     : "Semua tools di {$location->name} dan seluruh sub lokasinya",
             ],
+            'categories' => Category::query()
+                ->select(['id', 'name', 'slug'])
+                ->with([
+                    'attributes' => fn($query) => $query
+                        ->select(['id', 'category_id', 'field_name'])
+                        ->orderBy('field_name'),
+                ])
+                ->orderBy('name')
+                ->get(),
 
+
+            'locations' => Location::query()
+                ->select(['id', 'name', 'slug', 'parent_id'])
+                ->with([
+                    'parent:id,name,slug',
+                ])
+                ->orderBy('name')
+                ->get(),
+
+
+            'users' => User::query()
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get(),
+            'statuses' => ToolEnum::options(),
+            'inventory_types' => InventoryTypeEnum::options(),
             'location' => [
                 'id' => $location->id,
                 'name' => $location->name,

@@ -46,8 +46,6 @@ export default function SubLocationTool({
         setEditOpen(true);
     };
 
-    console.log(categories);
-
     /*
      * ============================================================
      * FILTER TOOLS

@@ -16,13 +16,33 @@ import hasAnyPermissions from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { IconArrowLeft, IconDoor, IconLocation, IconPlus, IconRefresh } from '@tabler/icons-react';
 import { useState } from 'react';
+import EditToolModal from '@/Components/EditToolModal';
+import CreateToolModal from '@/Components/CreateToolModal';
 
-export default function LocationTool({ auth, location, tools: toolsProp, state }) {
+export default function LocationTool({
+    categories,
+    statuses,
+    inventory_types,
+    users,
+    auth,
+    location,
+    locations,
+    tools: toolsProp,
+    state,
+}) {
     const { data: tools, meta: toolsMeta, links: toolsLinks } = toolsProp;
 
     const [params, setParams] = useState(state);
 
     const [view, setView] = useViewMode('location-tools-view', 'table');
+    const [createOpen, setCreateOpen] = useState(false);
+    const [selectedTool, setSelectedTool] = useState(null);
+    const [editOpen, setEditOpen] = useState(false);
+
+    const onEditTrigger = (tool) => {
+        setSelectedTool(tool);
+        setEditOpen(true);
+    };
 
     /*
      * ============================================================
@@ -205,7 +225,12 @@ export default function LocationTool({ auth, location, tools: toolsProp, state }
                             </div>
 
                             {hasAnyPermissions(auth.permissions, ['tools.create']) && (
-                                <Button variant="blue" size="sm" className="w-full shrink-0 lg:w-auto">
+                                <Button
+                                    variant="blue"
+                                    size="sm"
+                                    onClick={() => setCreateOpen(true)}
+                                    className="w-full shrink-0 lg:w-auto"
+                                >
                                     <IconPlus className="size-4" />
                                     Tambah Tool
                                 </Button>
@@ -232,7 +257,7 @@ export default function LocationTool({ auth, location, tools: toolsProp, state }
                              */
                             <div className="grid grid-cols-1 gap-4 px-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {tools.map((tool) => (
-                                    <ToolCard key={tool.id} tool={tool} auth={auth} />
+                                    <ToolCard onEditTrigger={onEditTrigger} key={tool.id} tool={tool} auth={auth} />
                                 ))}
                             </div>
                         ) : (
@@ -245,6 +270,7 @@ export default function LocationTool({ auth, location, tools: toolsProp, state }
                                 tools={tools}
                                 meta={toolsMeta}
                                 auth={auth}
+                                onEditTrigger={onEditTrigger}
                                 onSortable={onSortable}
                                 dynamicColumns={[]}
                                 showCategory={true}
@@ -268,6 +294,32 @@ export default function LocationTool({ auth, location, tools: toolsProp, state }
                     </CardFooter>
                 </Card>
             </div>
+
+            <EditToolModal
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                tool={selectedTool}
+                categories={categories}
+                locations={locations}
+                lockCategory={null}
+                lockLocation={{ id: location.id, name: location.name }}
+                users={users}
+                action="PUT"
+                inventory_types={inventory_types}
+                statuses={statuses}
+            />
+            <CreateToolModal
+                open={createOpen}
+                onOpenChange={setCreateOpen}
+                categories={categories}
+                locations={locations}
+                users={users}
+                action={route('tools.store')}
+                method={'POST'}
+                inventory_types={inventory_types}
+                statuses={statuses}
+                lockLocation={{ id: location.id, name: location.name }}
+            />
         </>
     );
 }
