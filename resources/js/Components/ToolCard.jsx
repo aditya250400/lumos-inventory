@@ -12,7 +12,7 @@ import hasAnyPermissions, { deleteAction } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { IconDotsVertical, IconEye, IconPencil, IconPhoto, IconTrash } from '@tabler/icons-react';
 
-export default function ToolCard({ tool, auth, setEditingTool }) {
+export default function ToolCard({ tool, auth, setEditingTool, onEditTrigger }) {
     return (
         <Card className="overflow-hidden py-0">
             {/* Image */}
@@ -35,7 +35,7 @@ export default function ToolCard({ tool, auth, setEditingTool }) {
                 </div>
 
                 {/* Action */}
-                {hasAnyPermissions(auth.permissions, ['tool', 'tool.update', 'tool.delete']) && (
+                {hasAnyPermissions(auth.permissions, ['tools.index', 'tools.update', 'tools.delete']) && (
                     <div className="absolute right-2 top-2 z-10">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -45,23 +45,22 @@ export default function ToolCard({ tool, auth, setEditingTool }) {
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                {hasAnyPermissions(auth.permissions, ['tool']) && (
+                                {hasAnyPermissions(auth.permissions, ['tools.index']) && (
                                     <DropdownMenuItem asChild>
-                                        <Link href={route('tool.show', [tool.id])}>
+                                        <Link href={route('tools.index', [tool.id])}>
                                             <IconEye className="mr-2 size-4" />
                                             Lihat Detail
                                         </Link>
                                     </DropdownMenuItem>
                                 )}
-
-                                {hasAnyPermissions(auth.permissions, ['tool.update']) && (
-                                    <DropdownMenuItem onSelect={() => setEditingTool?.(tool)}>
+                                {hasAnyPermissions(auth.permissions, ['tools.update']) && (
+                                    <DropdownMenuItem onSelect={() => onEditTrigger(tool)}>
                                         <IconPencil className="mr-2 size-4" />
                                         Edit
                                     </DropdownMenuItem>
                                 )}
 
-                                {hasAnyPermissions(auth.permissions, ['tool.delete']) && (
+                                {hasAnyPermissions(auth.permissions, ['tools.delete']) && (
                                     <DropdownMenuItem
                                         className="text-red-600 focus:text-red-600"
                                         onSelect={(e) => e.preventDefault()}
@@ -73,7 +72,7 @@ export default function ToolCard({ tool, auth, setEditingTool }) {
                                                     Hapus
                                                 </div>
                                             }
-                                            action={() => deleteAction(route('tool.destroy', [tool.id]))}
+                                            action={() => deleteAction(route('tools.destroy', [tool.tool_code]))}
                                         />
                                     </DropdownMenuItem>
                                 )}
@@ -90,7 +89,12 @@ export default function ToolCard({ tool, auth, setEditingTool }) {
                 <p className="mb-2 text-xs text-muted-foreground">{tool.tool_code}</p>
 
                 <div className="flex items-center justify-between gap-2 text-sm">
-                    <span className="truncate text-muted-foreground">{tool.category?.name ?? '-'}</span>
+                    <Link
+                        href={route('category.show', [tool.category.slug])}
+                        className="truncate text-muted-foreground"
+                    >
+                        {tool.category?.name ?? '-'}
+                    </Link>
 
                     <span className="shrink-0 font-medium">Stok {tool.stock}</span>
                 </div>

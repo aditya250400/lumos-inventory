@@ -16,11 +16,9 @@ import hasAnyPermissions, { deleteAction, formatDateIndo } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import {
     IconArrowLeft,
-    IconArrowsDownUp,
     IconBox,
     IconCategory2,
     IconDoor,
-    IconFilter,
     IconPackages,
     IconPencil,
     IconPlus,
@@ -31,12 +29,16 @@ import {
 } from '@tabler/icons-react';
 import { useEffect, useMemo, useState } from 'react';
 import AttributeModal from './AttributeModal';
-import ToolStatusBadge from '@/Components/ToolStatusBadge';
 import StatCard from '@/Components/StatCard';
 import ShowFilter from '@/Components/ShowFilter';
 import ToolsTable from '@/Components/ToolsTable';
+import CreateToolModal from '@/Components/CreateToolModal';
+import EditToolModal from '@/Components/EditToolModal';
 
-export default function Show({ auth, category, tools: toolsProp, attributes, state }) {
+export default function Show(
+    { auth, category, tools: toolsProp, categories, locations, users, attributes, state, inventory_types, statuses },
+    props,
+) {
     const { data: tools, meta: toolsMeta, links: toolsLinks } = toolsProp;
 
     /*
@@ -69,9 +71,16 @@ export default function Show({ auth, category, tools: toolsProp, attributes, sta
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editingAtt, setEditingAtt] = useState(null);
+    const [createOpen, setCreateOpen] = useState(false);
     const [view, setView] = useViewMode('category-detail-tools-view', 'table');
     const [params, setParams] = useState(state);
+    const [selectedTool, setSelectedTool] = useState(null);
+    const [editOpen, setEditOpen] = useState(false);
 
+    const onEditTrigger = (tool) => {
+        setSelectedTool(tool);
+        setEditOpen(true);
+    };
     const openCreate = () => {
         setEditingAtt(null);
         setModalOpen(true);
@@ -124,7 +133,7 @@ export default function Show({ auth, category, tools: toolsProp, attributes, sta
                 <div className="grid grid-cols-2 gap-3 pb-6 lg:grid-cols-4">
                     <StatCard icon={IconBox} value={category.tools_count} label="Total Tools" />
                     <StatCard icon={IconPackages} value={category.tools_sum_stock} label="Total Stok" />
-                    <StatCard icon={IconTag} value={category.toolAttributes_count} label="Attribute" />
+                    <StatCard icon={IconTag} value={category.attributes_count} label="Attribute" />
                     <StatCard icon={IconStack2} value={category.attribute_values_count} label="Attribute Values" />
                 </div>
 
@@ -209,7 +218,12 @@ export default function Show({ auth, category, tools: toolsProp, attributes, sta
                                     </div>
 
                                     {hasAnyPermissions(auth.permissions, ['tools.create']) && (
-                                        <Button variant="blue" size="sm" className="w-full shrink-0 lg:w-auto">
+                                        <Button
+                                            onClick={() => setCreateOpen(true)}
+                                            variant="blue"
+                                            size="sm"
+                                            className="w-full shrink-0 lg:w-auto"
+                                        >
                                             <IconPlus className="size-4" />
                                             Tambah Tool
                                         </Button>
@@ -250,7 +264,7 @@ export default function Show({ auth, category, tools: toolsProp, attributes, sta
                             ) : view === 'card' ? (
                                 <div className="grid grid-cols-1 gap-4 px-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                     {tools.map((tool) => (
-                                        <ToolCard key={tool.id} tool={tool} auth={auth} />
+                                        <ToolCard onEditTrigger={onEditTrigger} key={tool.id} tool={tool} auth={auth} />
                                     ))}
                                 </div>
                             ) : (
@@ -258,6 +272,7 @@ export default function Show({ auth, category, tools: toolsProp, attributes, sta
                                     tools={tools}
                                     meta={toolsMeta}
                                     auth={auth}
+                                    onEditTrigger={onEditTrigger}
                                     onSortable={onSortable}
                                     showNote={true}
                                     dynamicColumns={dynamicColumns}
@@ -350,6 +365,31 @@ export default function Show({ auth, category, tools: toolsProp, attributes, sta
                 </Card>
             </div>
 
+            <CreateToolModal
+                open={createOpen}
+                onOpenChange={setCreateOpen}
+                categories={categories}
+                locations={locations}
+                users={users}
+                action={route('tools.store')}
+                method={'POST'}
+                inventory_types={inventory_types}
+                statuses={statuses}
+                lockCategory={{ id: category.id, name: category.name }}
+                lockLocation={null}
+            />
+            <EditToolModal
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                tool={selectedTool}
+                categories={categories}
+                locations={locations}
+                lockCategory={{ id: category.id, name: category.name }}
+                users={users}
+                action="PUT"
+                inventory_types={inventory_types}
+                statuses={statuses}
+            />
             {/* Attribute Modal */}
             <AttributeModal
                 open={modalOpen}

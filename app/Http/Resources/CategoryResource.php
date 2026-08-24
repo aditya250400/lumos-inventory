@@ -19,12 +19,12 @@ class CategoryResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'attributes' => ToolAttributeResource::collection(
-                $this->whenLoaded('toolAttributes')
+                $this->whenLoaded('attributes')
             ),
             'tools_count' => $this->tools_count ?? 0,
             'tools_sum_stock' => $this->tools_sum_stock ?? 0,
             'attribute_values_count' => $this->attribute_values_count,
-            'toolAttributes_count' => $this->toolAttributes_count ?? 0,
+            'attributes_count' => $this->attributes_count ?? 0,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

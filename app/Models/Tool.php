@@ -10,6 +10,8 @@ class Tool extends Model
 {
     protected $guarded = [];
 
+
+
     public function attributeValues()
     {
         return $this->hasMany(ToolAttributeValue::class);
@@ -33,6 +35,11 @@ class Tool extends Model
     public function location()
     {
         return $this->belongsTo(Location::class);
+    }
+
+    public function stockOpnameDetails()
+    {
+        return $this->hasMany(StockOpnameDetail::class);
     }
 
     public function scopeFilter(Builder $query, $filters)

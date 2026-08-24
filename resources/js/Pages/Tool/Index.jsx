@@ -1,4 +1,3 @@
-import AlertAction from '@/Components/AlertAction';
 import EmptyState from '@/Components/EmptyState';
 import HeaderTitle from '@/Components/HeaderTitle';
 import PaginationTable from '@/Components/PaginationTable';
@@ -7,22 +6,11 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import UseFilter from '@/hooks/UseFilter';
 import AppLayout from '@/Layouts/AppLayout';
 import hasAnyPermissions, { deleteAction, formatDateIndo } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import {
-    IconArrowsDownUp,
-    IconCategory2,
-    IconDoor,
-    IconFilter,
-    IconLocationSearch,
-    IconPencil,
-    IconPlus,
-    IconRefresh,
-    IconTrash,
-} from '@tabler/icons-react';
+import { IconCategory2, IconDoor, IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import ViewSwitcher from '@/Components/ViewSwitcher';
 import useViewMode from '@/hooks/UseViewMode';
@@ -32,14 +20,21 @@ import CreateCategoryModal from '../Category/CreateCategoryModal';
 import ToolsTable from '@/Components/ToolsTable';
 import ToolsFilterModal from '@/Components/ToolsFilterModal';
 import ToolCard from '@/Components/ToolCard';
+import CreateToolModal from '@/Components/CreateToolModal';
+import EditToolModal from '@/Components/EditToolModal';
 
 export default function Index(props) {
     const { data: tools, meta: toolsMeta, links: toolsLinks } = props.tools;
     const [params, setParams] = useState(props.state);
     const [createOpen, setCreateOpen] = useState(false);
+    const [selectedTool, setSelectedTool] = useState(null);
+    const [editOpen, setEditOpen] = useState(false);
     const [view, setView] = useViewMode('tools-index-view', 'card');
-    const [editingCategory, setEditingCategory] = useState(null);
-    const [filterOpen, setFilterOpen] = useState(false);
+
+    const onEditTrigger = (tool) => {
+        setSelectedTool(tool);
+        setEditOpen(true);
+    };
 
     const onSortable = (field) => {
         setParams({
@@ -143,7 +138,12 @@ export default function Index(props) {
                         ) : view === 'card' ? (
                             <div className="grid grid-cols-1 gap-4 px-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {tools.map((tool) => (
-                                    <ToolCard key={tool.id} tool={tool} auth={props.auth} />
+                                    <ToolCard
+                                        onEditTrigger={onEditTrigger}
+                                        key={tool.id}
+                                        tool={tool}
+                                        auth={props.auth}
+                                    />
                                 ))}
                             </div>
                         ) : (
@@ -153,6 +153,7 @@ export default function Index(props) {
                                 auth={props.auth}
                                 onSortable={onSortable}
                                 showNote={true}
+                                onEditTrigger={onEditTrigger}
                                 showCategory={true}
                             />
                         )}
@@ -171,18 +172,29 @@ export default function Index(props) {
                 </Card>
             </div>
 
-            <CreateCategoryModal
-                users={props.users}
-                action={props.page_settings.action}
-                method={props.page_settings.method}
+            <CreateToolModal
                 open={createOpen}
                 onOpenChange={setCreateOpen}
+                categories={props.categories}
+                locations={props.locations}
+                users={props.users}
+                action={props.action}
+                method={props.method}
+                inventory_types={props.inventory_types}
+                statuses={props.statuses}
+                lockCategory={null}
+                lockLocation={null}
             />
-            <EditCategoryModal
-                open={editingCategory !== null}
-                onOpenChange={(isOpen) => !isOpen && setEditingCategory(null)}
-                category={editingCategory}
-                method="PUT"
+            <EditToolModal
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                tool={selectedTool}
+                categories={props.categories}
+                locations={props.locations}
+                users={props.users}
+                action="PUT"
+                inventory_types={props.inventory_types}
+                statuses={props.statuses}
             />
         </>
     );

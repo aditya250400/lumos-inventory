@@ -5,12 +5,14 @@ import { Button } from '@/Components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import hasAnyPermissions, { deleteAction, formatDateIndo } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import { IconArrowsDownUp, IconTrash } from '@tabler/icons-react';
+import { IconArrowsDownUp, IconLocationSearch, IconPencil, IconTrash } from '@tabler/icons-react';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 export default function ToolsTable({
     tools,
     meta,
     auth,
+    onEditTrigger,
     onSortable,
     dynamicColumns = [],
     showCategory = false,
@@ -57,7 +59,9 @@ export default function ToolsTable({
                     ))}
                     {/* Optional: note */}
                     {showNote && <TableHead>Catatan</TableHead>}
-                    <TableHead>Dibuat Pada</TableHead>
+                    <TableHead>
+                        <SortableHead label="Dibuat pada" field="created_at" onSortable={onSortable} />
+                    </TableHead>
                     <TableHead>Aksi</TableHead>
                 </TableRow>
             </TableHeader>
@@ -69,7 +73,13 @@ export default function ToolsTable({
 
                         <TableCell>{tool.tool_code}</TableCell>
 
-                        <TableCell>{tool.name}</TableCell>
+                        <TableCell className="flex items-center gap-2">
+                            <Avatar>
+                                <AvatarImage src={tool.primary_image} />
+                                <AvatarFallback>{tool.name.substring(0, 1)}</AvatarFallback>
+                            </Avatar>
+                            <span>{tool.name}</span>
+                        </TableCell>
 
                         {/* Optional: kategori */}
                         {showCategory && <TableCell>{tool.category?.name ?? '-'}</TableCell>}
@@ -113,17 +123,25 @@ export default function ToolsTable({
                         <TableCell>
                             <div className="flex items-center justify-center gap-x-1">
                                 <Button variant="purple" size="sm" asChild>
-                                    <Link href={route('tools.show', [tool.id])}>Detail</Link>
+                                    <Link href={route('tools.show', [tool.id])}>
+                                        <IconLocationSearch size="4" />
+                                        Detail
+                                    </Link>
                                 </Button>
-
+                                {hasAnyPermissions(auth.permissions, ['tools.update', [tool]]) && onEditTrigger && (
+                                    <Button onClick={() => onEditTrigger(tool)} variant="blue" size="sm">
+                                        <IconPencil size="4" />
+                                        Edit
+                                    </Button>
+                                )}
                                 {hasAnyPermissions(auth.permissions, ['tools.delete']) && (
                                     <AlertAction
                                         trigger={
                                             <Button variant="red" size="sm">
-                                                <IconTrash className="size-4" />
+                                                <IconTrash className="size-4" /> Delete
                                             </Button>
                                         }
-                                        action={() => deleteAction(route('tools.destroy', [tool.id]))}
+                                        action={() => deleteAction(route('tools.destroy', [tool]))}
                                     />
                                 )}
                             </div>

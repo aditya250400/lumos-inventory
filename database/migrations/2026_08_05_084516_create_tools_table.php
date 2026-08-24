@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('tool_code');
             $table->string('name');
             $table->integer('stock');
-            $table->text('note');
+            $table->text('note')->nullable();
             $table->string('status')->default(ToolEnum::AVAILABLE->value);
             $table->string('inventory_type')->default(InventoryTypeEnum::INTERNAL->value);
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();

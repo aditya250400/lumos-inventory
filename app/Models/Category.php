@@ -17,7 +17,7 @@ class Category extends Model
         return $this->hasMany(Tool::class);
     }
 
-    public function toolAttributes()
+    public function attributes()
     {
         return $this->hasMany(ToolAttribute::class);
     }

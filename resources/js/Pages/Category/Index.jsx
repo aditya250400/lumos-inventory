@@ -214,7 +214,7 @@ export default function Index(props) {
                                             <TableCell>{index + 1 + (meta.current_page - 1) * meta.per_page}</TableCell>
                                             <TableCell>{category.name}</TableCell>
                                             <TableCell>{category.tools_count}</TableCell>
-                                            <TableCell>{category.toolAttributes_count}</TableCell>
+                                            <TableCell>{category.attributes_count}</TableCell>
 
                                             <TableCell>{formatDateIndo(category.created_at)}</TableCell>
 

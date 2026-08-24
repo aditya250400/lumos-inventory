@@ -82,7 +82,7 @@ export default function CategoryCard({ category, auth, setEditingCategory }) {
                         <p className="text-xs text-muted-foreground">Tools</p>
                     </div>
                     <div>
-                        <p className="text-base font-bold">{category.toolAttributes_count}</p>
+                        <p className="text-base font-bold">{category.attributes_count}</p>
                         <p className="text-xs text-muted-foreground">Attributes</p>
                     </div>
                 </div>

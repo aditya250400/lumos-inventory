@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\InventoryTypeEnum;
 use App\Enums\MessageType;
+use App\Enums\ToolEnum;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\ToolAttributeRequest;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ToolAttributeResource;
 use App\Http\Resources\ToolsResource;
 use App\Models\Category;
+use App\Models\Location;
 use App\Models\Tool;
 use App\Models\ToolAttribute;
 use App\Models\ToolAttributeValue;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -24,8 +28,8 @@ class CategoryController extends Controller
             ->sorting(
                 request()->only(['field', 'direction'])
             )
-            ->withCount(['tools', 'toolAttributes'])
-            ->with(['toolAttributes' => fn($query) => $query->withCount('values')->with('category')->orderBy('field_name')])
+            ->withCount(['tools', 'attributes'])
+            ->with(['attributes' => fn($query) => $query->withCount('values')->with('category')->orderBy('field_name')])
             ->orderBy('name')
             ->paginate(request()->load ?? 10);
 
@@ -54,7 +58,7 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        $category->loadCount(['tools', 'toolAttributes as toolAttributes_count'])
+        $category->loadCount(['tools', 'attributes as attributes_count'])
             ->loadSum('tools', 'stock');
 
 
@@ -66,13 +70,13 @@ class CategoryController extends Controller
         $tools = Tool::filter(request()->only(['search']))
             ->sorting(request()->only(['field', 'direction']))
             ->where('category_id', $category->id)
-            ->with(['location' => fn($query) => $query->with('parent'), 'images', 'attributeValues.attribute', 'usedBy'])
+            ->with(['location' => fn($query) => $query->with('parent'), 'images', 'attributeValues.attribute', 'usedBy', 'category'])
             ->paginate(request()->load ?? 10);
 
         // Definisi attribute per kategori biasanya sedikit -> ambil semua (gak usah dipaginasi),
         // sekalian dipakai buat nentuin kolom dinamis di tabel Tools (aman karena semua row di
         // halaman ini sudah pasti 1 kategori yang sama).
-        $attributes = $category->toolAttributes()
+        $attributes = $category->attributes()
             ->withCount('values')
             ->orderBy('field_name')
             ->get();
@@ -82,6 +86,33 @@ class CategoryController extends Controller
                 'title' => $category->name,
                 'subtitle' => "Detail kategori {$category->name}",
             ],
+            'action' => route('tools.store'),
+            'categories' => Category::query()
+                ->select(['id', 'name', 'slug'])
+                ->with([
+                    'attributes' => fn($query) => $query
+                        ->select(['id', 'category_id', 'field_name'])
+                        ->orderBy('field_name'),
+                ])
+                ->orderBy('name')
+                ->get(),
+
+
+            'locations' => Location::query()
+                ->select(['id', 'name', 'slug', 'parent_id'])
+                ->with([
+                    'parent:id,name,slug',
+                ])
+                ->orderBy('name')
+                ->get(),
+
+
+            'users' => User::query()
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get(),
+            'statuses' => ToolEnum::options(),
+            'inventory_types' => InventoryTypeEnum::options(),
             'category' => new CategoryResource($category),
             'tools' => ToolsResource::collection($tools)->additional([
                 'meta' => [
@@ -144,7 +175,7 @@ class CategoryController extends Controller
                     ->values();
 
                 // 2. Cari attribute lama yang sudah tidak ada di payload
-                $toDelete = $category->toolAttributes()
+                $toDelete = $category->attributes()
                     ->whereNotIn('id', $incomingIds)
                     ->withCount('values')
                     ->get();
@@ -161,7 +192,7 @@ class CategoryController extends Controller
                 }
 
                 // 4. Hapus attribute yang sudah tidak ada di payload
-                $category->toolAttributes()
+                $category->attributes()
                     ->whereNotIn('id', $incomingIds)
                     ->delete();
 
@@ -172,11 +203,11 @@ class CategoryController extends Controller
                     ];
 
                     if (!empty($attribute['id'])) {
-                        $category->toolAttributes()
+                        $category->attributes()
                             ->whereKey($attribute['id'])
                             ->update($payload);
                     } else {
-                        $category->toolAttributes()->create($payload);
+                        $category->attributes()->create($payload);
                     }
                 }
             });
@@ -233,7 +264,7 @@ class CategoryController extends Controller
     public function storeAttribute(ToolAttributeRequest $request, Category $category)
     {
         try {
-            $category->toolAttributes()->create([
+            $category->attributes()->create([
                 'field_name' => $request['field_name'],
             ]);
 

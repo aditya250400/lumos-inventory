@@ -73,10 +73,10 @@ Route::middleware('auth')->group(function () {
     // tools
     Route::controller(ToolController::class)->group(function () {
         Route::get('tools', 'index')->name('tools.index')->middleware('permission:tools.index');
-        Route::get('tools/{tool:slug}', 'show')->name('tools.show');
+        Route::get('tools/{tool:tool_code}', 'show')->name('tools.show');
         Route::post('tools/create', 'store')->name('tools.store')->middleware('permission:tools.create');
-        Route::put('tools/edit/{tool:slug}', 'update')->name('tools.update')->middleware('permission:tools.update');
-        Route::delete('tools/destroy/{tool:slug}', 'destroy')->name('tools.destroy')->middleware('permission:tools.delete');
+        Route::put('tools/edit/{tool:tool_code}', 'update')->name('tools.update')->middleware('permission:tools.update');
+        Route::delete('tools/destroy/{tool:tool_code}', 'destroy')->name('tools.destroy')->middleware('permission:tools.delete');
     });
 
 

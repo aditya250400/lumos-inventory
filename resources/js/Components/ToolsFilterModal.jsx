@@ -114,7 +114,7 @@ export default function ToolsFilterModal({
                 FILTER BUTTON
             ==================================================== */}
             <DialogTrigger asChild>
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="xl">
                     <IconFilter className="size-4" />
                     Filter
                 </Button>
