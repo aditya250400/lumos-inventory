@@ -275,7 +275,7 @@ export default function SubLocationTool({
                 categories={categories}
                 locations={locations}
                 lockCategory={null}
-                lockLocation={{ id: subLocation.id, name: subLocation.name }}
+                lockLocation={subLocation}
                 users={users}
                 action="PUT"
                 inventory_types={inventory_types}
@@ -291,7 +291,7 @@ export default function SubLocationTool({
                 method={'POST'}
                 inventory_types={inventory_types}
                 statuses={statuses}
-                lockLocation={{ id: subLocation.id, name: subLocation.name }}
+                lockLocation={subLocation}
             />
         </>
     );

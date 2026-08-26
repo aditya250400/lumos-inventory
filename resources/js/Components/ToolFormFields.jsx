@@ -28,6 +28,14 @@ export default function ToolFormFields({
 
     const selectedCategory = categories.find((c) => String(c.id) === String(data.category_id));
 
+    const selectedLocation = locations.find((location) => String(location.id) === String(data.location_id));
+
+    const locationDisplay = lockLocation
+        ? `${lockLocation.name}${lockLocation.parent?.name ? ` (${lockLocation.parent.name})` : ''}`
+        : selectedLocation
+          ? `${selectedLocation.name}${selectedLocation.parent?.name ? ` (${selectedLocation.parent.name})` : ''}`
+          : '';
+
     const categoryAttributes = selectedCategory?.attributes ?? [];
 
     const getAttrValue = (attributeId) => data.attributes.find((a) => a.tool_attribute_id === attributeId)?.value ?? '';
@@ -87,7 +95,7 @@ export default function ToolFormFields({
                                 disabled={Boolean(lockLocation)}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Pilih lokasi">{lockLocation?.name}</SelectValue>
+                                    <SelectValue placeholder="Pilih lokasi">{locationDisplay}</SelectValue>
                                 </SelectTrigger>
 
                                 <SelectContent>

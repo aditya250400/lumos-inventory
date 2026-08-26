@@ -37,9 +37,9 @@ Locations can contain multiple sub-locations when needed.
 Example:
 
 - Maranatha
-  - Desk A
-  - Desk B
-  - Technician Cabinet
+    - Desk A
+    - Desk B
+    - Technician Cabinet
 
 Meanwhile, simpler locations such as **Kembar** can exist without any child locations.
 

@@ -12,7 +12,7 @@ import hasAnyPermissions, { deleteAction } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { IconDotsVertical, IconEye, IconPencil, IconPhoto, IconTrash } from '@tabler/icons-react';
 
-export default function ToolCard({ tool, auth, setEditingTool, onEditTrigger }) {
+export default function ToolCard({ tool, auth, onEditTrigger }) {
     return (
         <Card className="overflow-hidden py-0">
             {/* Image */}
@@ -47,7 +47,7 @@ export default function ToolCard({ tool, auth, setEditingTool, onEditTrigger }) 
                             <DropdownMenuContent align="end">
                                 {hasAnyPermissions(auth.permissions, ['tools.index']) && (
                                     <DropdownMenuItem asChild>
-                                        <Link href={route('tools.index', [tool.id])}>
+                                        <Link href={route('tools.show', [tool.tool_code])}>
                                             <IconEye className="mr-2 size-4" />
                                             Lihat Detail
                                         </Link>
@@ -84,15 +84,14 @@ export default function ToolCard({ tool, auth, setEditingTool, onEditTrigger }) 
 
             {/* Content */}
             <CardContent className="px-4 pb-4 pt-3">
-                <p className="truncate font-semibold">{tool.name}</p>
+                <Link href={route('tools.show', [tool.tool_code])} className="block truncate font-semibold">
+                    {tool.name}
+                </Link>
 
                 <p className="mb-2 text-xs text-muted-foreground">{tool.tool_code}</p>
 
                 <div className="flex items-center justify-between gap-2 text-sm">
-                    <Link
-                        href={route('category.show', [tool.category.slug])}
-                        className="truncate text-muted-foreground"
-                    >
+                    <Link href={route('category.show', [tool.category])} className="truncate text-muted-foreground">
                         {tool.category?.name ?? '-'}
                     </Link>
 

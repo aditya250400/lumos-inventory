@@ -302,7 +302,7 @@ export default function LocationTool({
                 categories={categories}
                 locations={locations}
                 lockCategory={null}
-                lockLocation={{ id: location.id, name: location.name }}
+                lockLocation={location}
                 users={users}
                 action="PUT"
                 inventory_types={inventory_types}
@@ -318,7 +318,7 @@ export default function LocationTool({
                 method={'POST'}
                 inventory_types={inventory_types}
                 statuses={statuses}
-                lockLocation={{ id: location.id, name: location.name }}
+                lockLocation={location}
             />
         </>
     );

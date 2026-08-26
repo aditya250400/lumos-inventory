@@ -85,13 +85,7 @@ export default function Login({ status }) {
                                     </div>
                                     {errors && <InputError message={errors.remember} />}
                                 </div>
-                                <Button
-                                    type="submit"
-                                    variant="blue"
-                                    size="xl"
-                                    className="w-full"
-                                    disabled={processing}
-                                >
+                                <Button type="submit" variant="blue" size="xl" className="w-full" disabled={processing}>
                                     Masuk
                                 </Button>
                             </div>

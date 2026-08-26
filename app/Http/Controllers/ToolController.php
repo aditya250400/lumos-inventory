@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Enums\MessageType;
 use App\Http\Requests\ToolRequest;
+use App\Http\Resources\ToolDetailResource;
 use App\Models\Image;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -93,7 +94,52 @@ class ToolController extends Controller
             ],
         ]);
     }
-    public function show() {}
+    public function show(Tool $tool)
+    {
+        $tool->load([
+            'category',
+            'location.parent',
+            'usedBy',
+            'images',
+            'attributeValues.attribute',
+            'stockOpnameDetails' => fn($query) => $query->with('stockOpname')->latest(),
+            'loans' => fn($query) => $query->with('loanBy')->latest(),
+        ]);
+
+        return inertia('Tool/Show', [
+            'page_settings' => [
+                'title' => $tool->name,
+                'subtitle' => "Detail tool {$tool->tool_code}",
+            ],
+            'categories' => Category::query()
+                ->select(['id', 'name', 'slug'])
+                ->with([
+                    'attributes' => fn($query) => $query
+                        ->select(['id', 'category_id', 'field_name'])
+                        ->orderBy('field_name'),
+                ])
+                ->orderBy('name')
+                ->get(),
+
+
+            'locations' => Location::query()
+                ->select(['id', 'name', 'slug', 'parent_id'])
+                ->with([
+                    'parent:id,name,slug',
+                ])
+                ->orderBy('name')
+                ->get(),
+
+
+            'users' => User::query()
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get(),
+            'statuses' => ToolEnum::options(),
+            'inventory_types' => InventoryTypeEnum::options(),
+            'tool' => new ToolDetailResource($tool),
+        ]);
+    }
 
     public function store(ToolRequest $request)
     {

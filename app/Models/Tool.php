@@ -37,6 +37,11 @@ class Tool extends Model
         return $this->belongsTo(Location::class);
     }
 
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
+
     public function stockOpnameDetails()
     {
         return $this->hasMany(StockOpnameDetail::class);

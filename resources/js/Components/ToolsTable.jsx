@@ -123,7 +123,7 @@ export default function ToolsTable({
                         <TableCell>
                             <div className="flex items-center justify-center gap-x-1">
                                 <Button variant="purple" size="sm" asChild>
-                                    <Link href={route('tools.show', [tool.id])}>
+                                    <Link href={route('tools.show', [tool])}>
                                         <IconLocationSearch size="4" />
                                         Detail
                                     </Link>
