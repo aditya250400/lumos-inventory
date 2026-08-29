@@ -37,6 +37,16 @@ class RoleSeeder extends Seeder
             'tools.update',
             'tools.delete',
 
+            'roles.index',
+            'roles.create',
+            'roles.update',
+            'roles.delete',
+
+            'users.index',
+            'users.create',
+            'users.update',
+            'users.delete',
+
             'stock_opname_details.index',
             'stock_opname_details.create',
             'stock_opname_details.update',
@@ -63,12 +73,37 @@ class RoleSeeder extends Seeder
             'tool_attribute_values.delete',
         ];
 
+        // Permission yang tidak boleh dimiliki Admin & Teknisi
+        $restrictedPermissions = [
+            'roles.index',
+            'roles.create',
+            'roles.update',
+            'roles.delete',
+
+            'users.index',
+            'users.create',
+            'users.update',
+            'users.delete',
+        ];
+
+        // Permission tanpa delete
         $withoutDelete = collect($allPermissions)
             ->reject(fn($permission) => str_ends_with($permission, '.delete'))
             ->values()
             ->toArray();
 
-        // Koordinator Internal
+        // Permission Admin & Teknisi:
+        // - Tidak ada roles.*
+        // - Tidak ada users.*
+        // - Tidak ada permission delete
+        $withoutDeleteAndManagement = collect($withoutDelete)
+            ->reject(fn($permission) => in_array($permission, $restrictedPermissions))
+            ->values()
+            ->toArray();
+
+        // ==========================================
+        // KOORDINATOR INTERNAL
+        // ==========================================
         $koordinator = Role::firstOrCreate([
             'name' => 'Koordinator Internal',
             'guard_name' => 'web',
@@ -76,7 +111,9 @@ class RoleSeeder extends Seeder
 
         $koordinator->syncPermissions($allPermissions);
 
-        // Owner
+        // ==========================================
+        // OWNER
+        // ==========================================
         $owner = Role::firstOrCreate([
             'name' => 'Owner',
             'guard_name' => 'web',
@@ -84,21 +121,25 @@ class RoleSeeder extends Seeder
 
         $owner->syncPermissions($allPermissions);
 
-        // Teknisi
+        // ==========================================
+        // TEKNISI
+        // ==========================================
         $teknisi = Role::firstOrCreate([
             'name' => 'Teknisi',
             'guard_name' => 'web',
         ]);
 
-        $teknisi->syncPermissions($withoutDelete);
+        $teknisi->syncPermissions($withoutDeleteAndManagement);
 
-        // Admin
+        // ==========================================
+        // ADMIN
+        // ==========================================
         $admin = Role::firstOrCreate([
             'name' => 'Admin',
             'guard_name' => 'web',
         ]);
 
-        $admin->syncPermissions($withoutDelete);
+        $admin->syncPermissions($withoutDeleteAndManagement);
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }

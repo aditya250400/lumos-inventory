@@ -374,9 +374,9 @@ export default function Show({ auth, tool, users, categories, locations, invento
                                 label="Lokasi"
                                 value={
                                     tool.location
-                                        ? `${tool.location.name}${
-                                              tool.location.parent ? ` (${tool.location.parent.name})` : ''
-                                          }`
+                                        ? tool.location.parent?.name
+                                            ? `${tool.location.name} (${tool.location.parent.name})`
+                                            : tool.location.name
                                         : '-'
                                 }
                             />

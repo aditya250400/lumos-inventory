@@ -21,7 +21,13 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CategorySeeder::class,
             LocationSeeder::class,
-            ToolSeeder::class,
+
+            ToolAttributeSeeder::class,
+
+            StorageSeeder::class,
+            FlashdiskSeeder::class,
+            ChargerSeeder::class,
+            ConverterSeeder::class,
         ]);
     }
 }

@@ -69,7 +69,12 @@ export default function Sidebar({ auth, url }) {
                     icon={IconCategory2}
                 />
                 <NavLink url={route('tools.index')} active={url.startsWith('/tools')} title="Tools" icon={IconTools} />
-                <NavLink url={'#'} active={url.startsWith('/roles')} title="Roles" icon={IconShieldCode} />
+                <NavLink
+                    url={route('roles.index')}
+                    active={url.startsWith('/roles')}
+                    title="Roles"
+                    icon={IconShieldCode}
+                />
                 <NavLink url={'#'} active={url.startsWith('/users')} title="Pengguna" icon={IconUsers} />
 
                 {/* Lainnya */}

@@ -26,6 +26,8 @@ class PermissionSeeder extends Seeder
             'image',
             'tool_attribute',
             'tool_attribute_values',
+            'roles',
+            'users',
         ];
 
         $actions = [

@@ -30,7 +30,7 @@ export default function CreateCategoryModal({ open, onOpenChange, users, action,
         _method: method,
     });
 
-    console.log(data);
+    data;
 
     useEffect(() => {
         if (!open) {

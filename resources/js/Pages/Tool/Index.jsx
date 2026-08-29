@@ -11,7 +11,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import hasAnyPermissions, { deleteAction, formatDateIndo } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { IconCategory2, IconDoor, IconPlus } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ViewSwitcher from '@/Components/ViewSwitcher';
 import useViewMode from '@/hooks/UseViewMode';
 import ToolsTable from '@/Components/ToolsTable';
@@ -19,18 +19,28 @@ import ToolsFilterModal from '@/Components/ToolsFilterModal';
 import ToolCard from '@/Components/ToolCard';
 import CreateToolModal from '@/Components/CreateToolModal';
 import EditToolModal from '@/Components/EditToolModal';
+import ToolDetailModal from './ToolDetailModal';
 
 export default function Index(props) {
     const { data: tools, meta: toolsMeta, links: toolsLinks } = props.tools;
     const [params, setParams] = useState(props.state);
-    const [createOpen, setCreateOpen] = useState(false);
     const [selectedTool, setSelectedTool] = useState(null);
-    const [editOpen, setEditOpen] = useState(false);
     const [view, setView] = useViewMode('tools-index-view', 'card');
+    const [editOpen, setEditOpen] = useState(false);
+    const [createOpen, setCreateOpen] = useState(false);
+    const [detailOpen, setDetailOpen] = useState(false);
+    const [detailTool, setDetailTool] = useState(null);
+
+    tools;
 
     const onEditTrigger = (tool) => {
         setSelectedTool(tool);
         setEditOpen(true);
+    };
+
+    const onDetailTrigger = (tool) => {
+        setDetailTool(tool);
+        setDetailOpen(true);
     };
 
     const onSortable = (field) => {
@@ -100,7 +110,7 @@ export default function Index(props) {
                                     </SelectTrigger>
 
                                     <SelectContent>
-                                        {[15, 25, 50, 75, 100].map((number, index) => (
+                                        {[50, 75, 100].map((number, index) => (
                                             <SelectItem key={index} value={number}>
                                                 {number}
                                             </SelectItem>
@@ -137,6 +147,7 @@ export default function Index(props) {
                                 {tools.map((tool) => (
                                     <ToolCard
                                         onEditTrigger={onEditTrigger}
+                                        onDetailTrigger={onDetailTrigger}
                                         key={tool.id}
                                         tool={tool}
                                         auth={props.auth}
@@ -149,6 +160,7 @@ export default function Index(props) {
                                 meta={toolsMeta}
                                 auth={props.auth}
                                 onSortable={onSortable}
+                                onDetailTrigger={onDetailTrigger}
                                 showNote={true}
                                 onEditTrigger={onEditTrigger}
                                 showCategory={true}
@@ -190,6 +202,18 @@ export default function Index(props) {
                 locations={props.locations}
                 users={props.users}
                 action="PUT"
+                inventory_types={props.inventory_types}
+                statuses={props.statuses}
+            />
+
+            <ToolDetailModal
+                open={detailOpen}
+                onOpenChange={setDetailOpen}
+                tool={detailTool}
+                auth={props.auth}
+                categories={props.categories}
+                locations={props.locations}
+                users={props.users}
                 inventory_types={props.inventory_types}
                 statuses={props.statuses}
             />

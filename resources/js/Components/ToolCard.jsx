@@ -12,7 +12,7 @@ import hasAnyPermissions, { deleteAction } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { IconDotsVertical, IconEye, IconPencil, IconPhoto, IconTrash } from '@tabler/icons-react';
 
-export default function ToolCard({ tool, auth, onEditTrigger }) {
+export default function ToolCard({ tool, auth, onEditTrigger, onDetailTrigger }) {
     return (
         <Card className="overflow-hidden py-0">
             {/* Image */}
@@ -46,11 +46,9 @@ export default function ToolCard({ tool, auth, onEditTrigger }) {
 
                             <DropdownMenuContent align="end">
                                 {hasAnyPermissions(auth.permissions, ['tools.index']) && (
-                                    <DropdownMenuItem asChild>
-                                        <Link href={route('tools.show', [tool.tool_code])}>
-                                            <IconEye className="mr-2 size-4" />
-                                            Lihat Detail
-                                        </Link>
+                                    <DropdownMenuItem onSelect={() => onDetailTrigger(tool)}>
+                                        <IconEye className="mr-2 size-4" />
+                                        Lihat Detail
                                     </DropdownMenuItem>
                                 )}
                                 {hasAnyPermissions(auth.permissions, ['tools.update']) && (
@@ -84,9 +82,9 @@ export default function ToolCard({ tool, auth, onEditTrigger }) {
 
             {/* Content */}
             <CardContent className="px-4 pb-4 pt-3">
-                <Link href={route('tools.show', [tool.tool_code])} className="block truncate font-semibold">
+                <p onClick={() => onDetailTrigger(tool)} className="block truncate font-semibold hover:cursor-pointer">
                     {tool.name}
-                </Link>
+                </p>
 
                 <p className="mb-2 text-xs text-muted-foreground">{tool.tool_code}</p>
 

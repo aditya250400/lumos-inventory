@@ -66,6 +66,29 @@ class ToolsResource extends JsonResource
                     fn($attributeValue) => [$attributeValue->attribute->field_name => $attributeValue->value]
                 );
             }),
+            'stock_opname_history' => $this->whenLoaded('stockOpnameDetails', function () {
+                return $this->stockOpnameDetails->map(fn($detail) => [
+                    'id' => $detail->id,
+                    'date' => optional($detail->stockOpname)->opname_date,
+                    'system_stock' => $detail->system_stock,
+                    'physical_stock' => $detail->physical_stock,
+                    'difference' => $detail->system_stock - $detail->physical_stock,
+                    'status' => $detail->status,
+                    'note' => $detail->note,
+                ]);
+            }),
+
+            'loan_history' => $this->whenLoaded('loans', function () {
+                return $this->loans->map(fn($loan) => [
+                    'id' => $loan->id,
+                    'loan_code' => $loan->loan_code,
+                    'loan_by' => optional($loan->loanBy)->name,
+                    'loan_date' => $loan->loan_date,
+                    'return_date' => $loan->return_date,
+                    'status' => $loan->status,
+                ]);
+            }),
+
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

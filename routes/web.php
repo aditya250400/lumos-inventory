@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ToolController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +75,8 @@ Route::middleware('auth')->group(function () {
     Route::controller(ToolController::class)->group(function () {
         Route::get('tools', 'index')->name('tools.index')->middleware('permission:tools.index');
         Route::get('tools/{tool:tool_code}', 'show')->name('tools.show');
+        Route::get('/tools/{tool:tool_code}/detail', [ToolController::class, 'detail'])
+            ->name('tools.detail');
         Route::post('tools/create', 'store')->name('tools.store')->middleware('permission:tools.create');
         Route::put('tools/edit/{tool:tool_code}', 'update')->name('tools.update')->middleware('permission:tools.update');
         Route::delete('tools/destroy/{tool:tool_code}', 'destroy')->name('tools.destroy')->middleware('permission:tools.delete');
@@ -99,6 +102,16 @@ Route::middleware('auth')->group(function () {
             'destroyAttribute'
         )->name('category.attributes.destroy')
             ->middleware('permission:category.delete');
+    });
+
+    // Role
+    Route::controller(RoleController::class)->group(function () {
+        Route::get('roles', 'index')->name('roles.index')->middleware('permission:roles.index');
+        Route::get('roles/create', 'create')->name('roles.create')->middleware('permission:roles.create');
+        Route::post('roles/create', 'store')->name('roles.store')->middleware('permission:roles.create');
+        Route::get('roles/edit/{role}', 'edit')->name('roles.edit')->middleware('permission:roles.update');
+        Route::put('roles/edit/{role}', 'update')->name('roles.update')->middleware('permission:roles.update');
+        Route::delete('roles/destroy/{role}', 'destroy')->name('roles.destroy')->middleware('permission:roles.delete');
     });
 });
 

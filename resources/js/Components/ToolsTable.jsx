@@ -15,6 +15,7 @@ export default function ToolsTable({
     onEditTrigger,
     onSortable,
     dynamicColumns = [],
+    onDetailTrigger,
     showCategory = false,
     showNote = false,
 }) {
@@ -116,17 +117,21 @@ export default function ToolsTable({
                         ))}
 
                         {/* Optional: kategori */}
-                        {showNote && <TableCell>{tool?.note ?? '-'}</TableCell>}
+                        {showNote && (
+                            <TableCell>
+                                <div className="w-[300px] max-w-[300px] overflow-auto whitespace-pre-wrap break-words align-top">
+                                    {tool?.note ?? '-'}
+                                </div>
+                            </TableCell>
+                        )}
 
                         <TableCell>{formatDateIndo(tool.created_at)}</TableCell>
 
                         <TableCell>
                             <div className="flex items-center justify-center gap-x-1">
-                                <Button variant="purple" size="sm" asChild>
-                                    <Link href={route('tools.show', [tool])}>
-                                        <IconLocationSearch size="4" />
-                                        Detail
-                                    </Link>
+                                <Button onClick={() => onDetailTrigger(tool)} variant="purple" size="sm">
+                                    <IconLocationSearch size="4" />
+                                    Detail
                                 </Button>
                                 {hasAnyPermissions(auth.permissions, ['tools.update', [tool]]) && onEditTrigger && (
                                     <Button onClick={() => onEditTrigger(tool)} variant="blue" size="sm">

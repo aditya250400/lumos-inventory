@@ -40,8 +40,13 @@ class ToolController extends Controller
                 'images',
                 'attributeValues.attribute',
                 'usedBy',
+                'stockOpnameDetails' => fn($query) =>
+                $query->with('stockOpname')->latest(),
+                'loans' => fn($query) =>
+                $query->with('loanBy')->latest(),
             ])
-            ->paginate(request()->input('load', 15))
+            ->orderBy('created_at', 'desc')
+            ->paginate(request()->input('load', 50))
             ->withQueryString();
 
         return inertia('Tool/Index', [
@@ -85,7 +90,7 @@ class ToolController extends Controller
             'state' => [
                 'page' => request()->page ?? 1,
                 'search' => request()->search ?? '',
-                'load' => 15,
+                'load' => 50,
                 'category' => request()->input('category', ''),
                 'location' => request()->input('location', ''),
                 'status' => request()->input('status', ''),
@@ -140,6 +145,24 @@ class ToolController extends Controller
             'tool' => new ToolDetailResource($tool),
         ]);
     }
+
+    public function detail(Tool $tool)
+    {
+        $tool->load([
+            'category',
+            'location.parent',
+            'usedBy',
+            'images',
+            'attributeValues.attribute',
+            'stockOpnameDetails' => fn($query) =>
+            $query->with('stockOpname')->latest(),
+            'loans' => fn($query) =>
+            $query->with('loanBy')->latest(),
+        ]);
+
+        return new ToolDetailResource($tool);
+    }
+
 
     public function store(ToolRequest $request)
     {

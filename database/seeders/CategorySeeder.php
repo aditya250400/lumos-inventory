@@ -24,7 +24,7 @@ class CategorySeeder extends Seeder
             'Mouse',
             'Monitor',
             'Kabel',
-            'Adapter',
+            'Converter',
         ];
 
         foreach ($categories as $category) {
