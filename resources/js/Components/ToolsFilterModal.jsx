@@ -22,6 +22,7 @@ export default function ToolsFilterModal({
     users = [],
     statuses = [],
     inventory_types = [],
+    state,
 }) {
     const [open, setOpen] = useState(false);
 
@@ -93,7 +94,9 @@ export default function ToolsFilterModal({
             status: '',
             inventory_type: '',
             used_by: '',
-            page: 1,
+            page: state.page,
+            load: state.load,
+            search: state.search,
         };
 
         setFilters({

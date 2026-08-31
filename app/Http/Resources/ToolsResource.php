@@ -66,6 +66,15 @@ class ToolsResource extends JsonResource
                     fn($attributeValue) => [$attributeValue->attribute->field_name => $attributeValue->value]
                 );
             }),
+
+            // digunain buat detail tool modal
+            'attributes_show' => $this->whenLoaded('attributeValues', function () {
+                return $this->attributeValues->map(fn($attributeValue) => [
+                    'field_name' => $attributeValue->attribute->field_name,
+                    'value' => $attributeValue->value,
+                ]);
+            }),
+
             'stock_opname_history' => $this->whenLoaded('stockOpnameDetails', function () {
                 return $this->stockOpnameDetails->map(fn($detail) => [
                     'id' => $detail->id,

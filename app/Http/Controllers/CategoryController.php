@@ -70,7 +70,18 @@ class CategoryController extends Controller
         $tools = Tool::filter(request()->only(['search']))
             ->sorting(request()->only(['field', 'direction']))
             ->where('category_id', $category->id)
-            ->with(['location' => fn($query) => $query->with('parent'), 'images', 'attributeValues.attribute', 'usedBy', 'category'])
+            ->with([
+
+                'stockOpnameDetails' => fn($query) =>
+                $query->with('stockOpname')->latest(),
+                'loans' => fn($query) =>
+                $query->with('loanBy')->latest(),
+                'location' => fn($query) => $query->with('parent'),
+                'images',
+                'attributeValues.attribute',
+                'usedBy',
+                'category'
+            ])
             ->paginate(request()->load ?? 10);
 
         // Definisi attribute per kategori biasanya sedikit -> ambil semua (gak usah dipaginasi),

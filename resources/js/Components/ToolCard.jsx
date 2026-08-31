@@ -45,12 +45,12 @@ export default function ToolCard({ tool, auth, onEditTrigger, onDetailTrigger })
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                {hasAnyPermissions(auth.permissions, ['tools.index']) && (
+                                {/* {hasAnyPermissions(auth.permissions, ['tools.index']) && (
                                     <DropdownMenuItem onSelect={() => onDetailTrigger(tool)}>
                                         <IconEye className="mr-2 size-4" />
                                         Lihat Detail
                                     </DropdownMenuItem>
-                                )}
+                                )} */}
                                 {hasAnyPermissions(auth.permissions, ['tools.update']) && (
                                     <DropdownMenuItem onSelect={() => onEditTrigger(tool)}>
                                         <IconPencil className="mr-2 size-4" />

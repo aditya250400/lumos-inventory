@@ -69,12 +69,16 @@ export default function ToolsTable({
 
             <TableBody>
                 {tools.map((tool, index) => (
-                    <TableRow key={tool.id}>
+                    <TableRow
+                        key={tool.id}
+                        onClick={() => onDetailTrigger(tool)}
+                        className="hover:cursor-pointer hover:bg-muted"
+                    >
                         <TableCell>{index + 1 + (meta.current_page - 1) * meta.per_page}</TableCell>
 
                         <TableCell>{tool.tool_code}</TableCell>
 
-                        <TableCell className="flex items-center gap-2">
+                        <TableCell onClick={() => onDetailTrigger(tool)} className="flex items-center gap-2">
                             <Avatar>
                                 <AvatarImage src={tool.primary_image} />
                                 <AvatarFallback>{tool.name.substring(0, 1)}</AvatarFallback>
@@ -127,12 +131,12 @@ export default function ToolsTable({
 
                         <TableCell>{formatDateIndo(tool.created_at)}</TableCell>
 
-                        <TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
                             <div className="flex items-center justify-center gap-x-1">
-                                <Button onClick={() => onDetailTrigger(tool)} variant="purple" size="sm">
+                                {/* <Button onClick={() => onDetailTrigger(tool)} variant="purple" size="sm">
                                     <IconLocationSearch size="4" />
                                     Detail
-                                </Button>
+                                </Button> */}
                                 {hasAnyPermissions(auth.permissions, ['tools.update', [tool]]) && onEditTrigger && (
                                     <Button onClick={() => onEditTrigger(tool)} variant="blue" size="sm">
                                         <IconPencil size="4" />

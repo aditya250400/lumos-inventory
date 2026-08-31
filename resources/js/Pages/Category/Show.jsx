@@ -34,6 +34,7 @@ import ShowFilter from '@/Components/ShowFilter';
 import ToolsTable from '@/Components/ToolsTable';
 import CreateToolModal from '@/Components/CreateToolModal';
 import EditToolModal from '@/Components/EditToolModal';
+import ToolDetailModal from '../Tool/ToolDetailModal';
 
 export default function Show(
     { auth, category, tools: toolsProp, categories, locations, users, attributes, state, inventory_types, statuses },
@@ -76,6 +77,14 @@ export default function Show(
     const [createOpen, setCreateOpen] = useState(false);
     const [selectedTool, setSelectedTool] = useState(null);
     const [editOpen, setEditOpen] = useState(false);
+
+    const [detailOpen, setDetailOpen] = useState(false);
+    const [detailTool, setDetailTool] = useState(null);
+
+    const onDetailTrigger = (tool) => {
+        setDetailTool(tool);
+        setDetailOpen(true);
+    };
 
     const onEditTrigger = (tool) => {
         setSelectedTool(tool);
@@ -264,7 +273,14 @@ export default function Show(
                             ) : view === 'card' ? (
                                 <div className="grid grid-cols-1 gap-4 px-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                     {tools.map((tool) => (
-                                        <ToolCard onEditTrigger={onEditTrigger} key={tool.id} tool={tool} auth={auth} />
+                                        <ToolCard
+                                            onDetailTrigger={onDetailTrigger}
+
+                                            onEditTrigger={onEditTrigger}
+                                            key={tool.id}
+                                            tool={tool}
+                                            auth={auth}
+                                        />
                                     ))}
                                 </div>
                             ) : (
@@ -272,6 +288,7 @@ export default function Show(
                                     tools={tools}
                                     meta={toolsMeta}
                                     auth={auth}
+                                    onDetailTrigger={onDetailTrigger}
                                     onEditTrigger={onEditTrigger}
                                     onSortable={onSortable}
                                     showNote={true}
@@ -403,6 +420,8 @@ export default function Show(
                 }
                 method={editingAtt ? 'put' : 'post'}
             />
+
+            <ToolDetailModal open={detailOpen} onOpenChange={setDetailOpen} tool={detailTool} />
         </>
     );
 }

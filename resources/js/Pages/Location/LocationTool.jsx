@@ -18,6 +18,7 @@ import { IconArrowLeft, IconDoor, IconLocation, IconPlus, IconRefresh } from '@t
 import { useState } from 'react';
 import EditToolModal from '@/Components/EditToolModal';
 import CreateToolModal from '@/Components/CreateToolModal';
+import ToolDetailModal from '../Tool/ToolDetailModal';
 
 export default function LocationTool({
     categories,
@@ -38,6 +39,13 @@ export default function LocationTool({
     const [createOpen, setCreateOpen] = useState(false);
     const [selectedTool, setSelectedTool] = useState(null);
     const [editOpen, setEditOpen] = useState(false);
+    const [detailOpen, setDetailOpen] = useState(false);
+    const [detailTool, setDetailTool] = useState(null);
+
+    const onDetailTrigger = (tool) => {
+        setDetailTool(tool);
+        setDetailOpen(true);
+    };
 
     const onEditTrigger = (tool) => {
         setSelectedTool(tool);
@@ -257,7 +265,13 @@ export default function LocationTool({
                              */
                             <div className="grid grid-cols-1 gap-4 px-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {tools.map((tool) => (
-                                    <ToolCard onEditTrigger={onEditTrigger} key={tool.id} tool={tool} auth={auth} />
+                                    <ToolCard
+                                        onDetailTrigger={onDetailTrigger}
+                                        onEditTrigger={onEditTrigger}
+                                        key={tool.id}
+                                        tool={tool}
+                                        auth={auth}
+                                    />
                                 ))}
                             </div>
                         ) : (
@@ -270,6 +284,7 @@ export default function LocationTool({
                                 tools={tools}
                                 meta={toolsMeta}
                                 auth={auth}
+                                onDetailTrigger={onDetailTrigger}
                                 onEditTrigger={onEditTrigger}
                                 onSortable={onSortable}
                                 dynamicColumns={[]}
@@ -320,6 +335,7 @@ export default function LocationTool({
                 statuses={statuses}
                 lockLocation={location}
             />
+            <ToolDetailModal open={detailOpen} onOpenChange={setDetailOpen} tool={detailTool} />
         </>
     );
 }

@@ -343,7 +343,19 @@ class LocationController extends Controller
         $tools = Tool::filter(request()->only(['search']))
             ->sorting(request()->only(['field', 'direction']))
             ->where('location_id', $subLocation->id)
-            ->with(['category', 'location' => fn($query) => $query->with('parent'), 'images', 'attributeValues.attribute', 'usedBy'])
+            ->with([
+                'category',
+
+
+                'stockOpnameDetails' => fn($query) =>
+                $query->with('stockOpname')->latest(),
+                'loans' => fn($query) =>
+                $query->with('loanBy')->latest(),
+                'location' => fn($query) => $query->with('parent'),
+                'images',
+                'attributeValues.attribute',
+                'usedBy'
+            ])
             ->paginate(request()->load ?? 10);
 
         return inertia('Location/SubLocationTool', [
@@ -455,6 +467,10 @@ class LocationController extends Controller
                 'category',
                 'location' => fn($locationQuery) => $locationQuery->with('parent'),
                 'images',
+                'stockOpnameDetails' => fn($query) =>
+                $query->with('stockOpname')->latest(),
+                'loans' => fn($query) =>
+                $query->with('loanBy')->latest(),
                 'attributeValues.attribute',
                 'usedBy',
             ])

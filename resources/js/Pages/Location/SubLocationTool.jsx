@@ -18,6 +18,7 @@ import ShowFilter from '@/Components/ShowFilter';
 import hasAnyPermissions from '@/lib/utils';
 import CreateToolModal from '@/Components/CreateToolModal';
 import EditToolModal from '@/Components/EditToolModal';
+import ToolDetailModal from '../Tool/ToolDetailModal';
 
 export default function SubLocationTool({
     auth,
@@ -40,6 +41,13 @@ export default function SubLocationTool({
     const [createOpen, setCreateOpen] = useState(false);
     const [selectedTool, setSelectedTool] = useState(null);
     const [editOpen, setEditOpen] = useState(false);
+    const [detailOpen, setDetailOpen] = useState(false);
+    const [detailTool, setDetailTool] = useState(null);
+
+    const onDetailTrigger = (tool) => {
+        setDetailTool(tool);
+        setDetailOpen(true);
+    };
 
     const onEditTrigger = (tool) => {
         setSelectedTool(tool);
@@ -230,7 +238,13 @@ export default function SubLocationTool({
                              */
                             <div className="grid grid-cols-1 gap-4 px-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {tools.map((tool) => (
-                                    <ToolCard onEditTrigger={onEditTrigger} key={tool.id} tool={tool} auth={auth} />
+                                    <ToolCard
+                                        onDetailTrigger={onDetailTrigger}
+                                        onEditTrigger={onEditTrigger}
+                                        key={tool.id}
+                                        tool={tool}
+                                        auth={auth}
+                                    />
                                 ))}
                             </div>
                         ) : (
@@ -244,6 +258,7 @@ export default function SubLocationTool({
                                 meta={toolsMeta}
                                 auth={auth}
                                 onEditTrigger={onEditTrigger}
+                                onDetailTrigger={onDetailTrigger}
                                 onSortable={onSortable}
                                 dynamicColumns={[]}
                                 showCategory={true}
@@ -293,6 +308,8 @@ export default function SubLocationTool({
                 statuses={statuses}
                 lockLocation={subLocation}
             />
+
+            <ToolDetailModal open={detailOpen} onOpenChange={setDetailOpen} tool={detailTool} />
         </>
     );
 }

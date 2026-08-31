@@ -69,6 +69,8 @@ function TablePagination({ page, setPage, totalPages, total, label }) {
 export default function ToolDetailModal({ open, onOpenChange, tool }) {
     const opname = usePagedList(tool?.stock_opname_history ?? []);
 
+    console.log(tool);
+
     const loans = usePagedList(tool?.loan_history ?? []);
 
     /*

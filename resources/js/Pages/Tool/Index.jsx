@@ -31,8 +31,6 @@ export default function Index(props) {
     const [detailOpen, setDetailOpen] = useState(false);
     const [detailTool, setDetailTool] = useState(null);
 
-    tools;
-
     const onEditTrigger = (tool) => {
         setSelectedTool(tool);
         setEditOpen(true);
@@ -122,6 +120,7 @@ export default function Index(props) {
                                     params={params}
                                     onApply={setParams}
                                     onClear={setParams}
+                                    state={props.state}
                                     categories={props.categories}
                                     locations={props.locations}
                                     users={props.users}
@@ -206,17 +205,7 @@ export default function Index(props) {
                 statuses={props.statuses}
             />
 
-            <ToolDetailModal
-                open={detailOpen}
-                onOpenChange={setDetailOpen}
-                tool={detailTool}
-                auth={props.auth}
-                categories={props.categories}
-                locations={props.locations}
-                users={props.users}
-                inventory_types={props.inventory_types}
-                statuses={props.statuses}
-            />
+            <ToolDetailModal open={detailOpen} onOpenChange={setDetailOpen} tool={detailTool} />
         </>
     );
 }
