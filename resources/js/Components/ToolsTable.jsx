@@ -74,7 +74,8 @@ export default function ToolsTable({
                         onClick={() => onDetailTrigger(tool)}
                         className="hover:cursor-pointer hover:bg-muted"
                     >
-                        <TableCell>{index + 1 + (meta.current_page - 1) * meta.per_page}</TableCell>
+                        {/* <TableCell>{index + 1 + (meta.current_page - 1) * meta.per_page}</TableCell> */}
+                        <TableCell>{tool.id}</TableCell>
 
                         <TableCell>{tool.tool_code}</TableCell>
 
@@ -116,7 +117,7 @@ export default function ToolsTable({
                         {/* Dynamic attributes */}
                         {dynamicColumns.map((column) => (
                             <TableCell key={column} className="bg-blue-50/50">
-                                {tool.attributes?.[column] ?? '-'}
+                                {tool.attributes?.find((col) => col.field_name == column).value ?? '-'}
                             </TableCell>
                         ))}
 

@@ -29,7 +29,12 @@ class ToolRequest extends FormRequest
 
             // Attribut dinamis sesuai kategori yang dipilih
             'attributes' => ['nullable', 'array'],
-            'attributes.*.tool_attribute_id' => ['required', 'integer', 'exists:tool_attributes,id'],
+            // 'attributes.*.tool_attribute_id' => ['required', 'integer', 'exists:tool_attributes,id'],
+            'attributes.*.tool_attribute_id' => [
+                'required',
+                'integer',
+                Rule::exists('tool_attributes', 'id')->where('category_id', $this->input('category_id')),
+            ],
             'attributes.*.value' => ['nullable', 'string', 'max:255'],
 
             // Foto: campuran foto lama (type=existing, punya id) dan foto baru (type=new, punya file)

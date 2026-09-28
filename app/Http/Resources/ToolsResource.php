@@ -62,9 +62,11 @@ class ToolsResource extends JsonResource
             // di-map jadi { "Kapasitas": "1TB", "Interface": "NVMe" } biar gampang dipakai
             // sebagai kolom dinamis di tabel (lihat diskusi attrMap sebelumnya)
             'attributes' => $this->whenLoaded('attributeValues', function () {
-                return $this->attributeValues->mapWithKeys(
-                    fn($attributeValue) => [$attributeValue->attribute->field_name => $attributeValue->value]
-                );
+                return $this->attributeValues->map(fn($attributeValue) => [
+                    'tool_attribute_id' => $attributeValue->tool_attribute_id,
+                    'field_name' => $attributeValue->attribute->field_name,
+                    'value' => $attributeValue->value,
+                ])->values();
             }),
 
             // digunain buat detail tool modal

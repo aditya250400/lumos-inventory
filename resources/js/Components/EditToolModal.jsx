@@ -125,20 +125,15 @@ export default function EditToolModal({
             location_id: String(tool.location?.id ?? ''),
             name: tool.name ?? '',
             stock: tool.stock ?? 0,
+            id: tool.id,
             inventory_type: tool.inventory_type ?? 'Internal',
-            used_by: tool.used_by ?? '',
+            used_by: tool.used_by?.id ? String(tool.used_by.id) : '',
             status: tool.status ?? 'Tersedia',
             note: tool.note ?? '',
-            attributes: Object.entries(tool.attributes ?? {}).map(([fieldName, value]) => {
-                const attr = categories
-                    .flatMap((category) => category.attributes ?? [])
-                    .find((attribute) => attribute.field_name === fieldName);
-
-                return {
-                    tool_attribute_id: attr?.id,
-                    value,
-                };
-            }),
+            attributes: (tool.attributes ?? []).map((attribute) => ({
+                tool_attribute_id: attribute.tool_attribute_id,
+                value: attribute.value,
+            })),
         };
 
         const savedData = savedText ? JSON.parse(savedText) : {};
