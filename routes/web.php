@@ -6,6 +6,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ToolController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +20,8 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     // Profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/{user}/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // dashboard
@@ -112,6 +113,16 @@ Route::middleware('auth')->group(function () {
         Route::get('roles/edit/{role}', 'edit')->name('roles.edit')->middleware('permission:roles.update');
         Route::put('roles/edit/{role}', 'update')->name('roles.update')->middleware('permission:roles.update');
         Route::delete('roles/destroy/{role}', 'destroy')->name('roles.destroy')->middleware('permission:roles.delete');
+    });
+
+    // users
+    Route::controller(UserController::class)->group(function () {
+        Route::get('users', 'index')->name('users.index')->middleware('permission:users.index');
+        Route::get('users/create', 'create')->name('users.create')->middleware('permission:users.index');
+        Route::post('users/create', 'store')->name('users.store')->middleware('permission:users.index');
+        Route::get('users/edit/{user}', 'edit')->name('users.edit')->middleware('permission:users.index');
+        Route::put('users/edit/{user}', 'update')->name('users.update')->middleware('permission:users.index');
+        Route::delete('users/destroy/{user}', 'destroy')->name('users.destroy')->middleware('permission:users.index');
     });
 });
 

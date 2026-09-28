@@ -1,5 +1,6 @@
 import NavLink from '@/Components/NavLink';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import hasAnyPermissions from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import {
     IconLayout2,
@@ -37,6 +38,7 @@ export default function Sidebar({ auth, url }) {
                     </Link>
                 </li>
 
+                {/* Dashboard */}
                 <NavLink
                     url={route('dashboard')}
                     active={url.startsWith('/dashboard')}
@@ -47,46 +49,92 @@ export default function Sidebar({ auth, url }) {
                 {/* Grup: Aktivitas */}
                 <div className="px-3 py-2 text-base font-medium text-white">Aktivitas</div>
 
-                <NavLink url="#" title="Stock Opname" icon={IconPencilCheck} />
-                <NavLink url="#" title="Peminjaman" icon={IconTagPlus} />
+                {hasAnyPermissions(auth.permissions, ['stock_opname.index']) && (
+                    <NavLink url="#" title="Stock Opname" icon={IconPencilCheck} />
+                )}
 
+                {hasAnyPermissions(auth.permissions, ['loans.index']) && (
+                    <NavLink url="#" title="Peminjaman" icon={IconTagPlus} />
+                )}
+
+                {/* Belum ada permission laporan di PermissionSeeder */}
                 <NavLink url="#" title="Laporan" icon={IconFileText} />
+
+                {/* Belum ada permission cetak dokumen di PermissionSeeder */}
                 <NavLink url="#" title="Cetak Dokumen" icon={IconPrinter} />
 
                 {/* Grup: Data Master */}
-                <div className="px-3 py-2 text-base font-medium text-white">Data Master</div>
+                {hasAnyPermissions(auth.permissions, [
+                    'location.index',
+                    'tools.index',
+                    'category.index',
+                    'roles.index',
+                    'users.index',
+                ]) && <div className="px-3 py-2 text-base font-medium text-white">Data Master</div>}
 
-                <NavLink
-                    url={route('location.index')}
-                    active={url.startsWith('/locations')}
-                    title="Lokasi"
-                    icon={IconLocation}
-                />
-                <NavLink
-                    url={route('category.index')}
-                    active={url.startsWith('/categories')}
-                    title="Kategori Tools"
-                    icon={IconCategory2}
-                />
-                <NavLink url={route('tools.index')} active={url.startsWith('/tools')} title="Tools" icon={IconTools} />
-                <NavLink
-                    url={route('roles.index')}
-                    active={url.startsWith('/roles')}
-                    title="Roles"
-                    icon={IconShieldCode}
-                />
-                <NavLink url={'#'} active={url.startsWith('/users')} title="Pengguna" icon={IconUsers} />
+                {hasAnyPermissions(auth.permissions, ['location.index']) && (
+                    <NavLink
+                        url={route('location.index')}
+                        active={url.startsWith('/locations')}
+                        title="Lokasi"
+                        icon={IconLocation}
+                    />
+                )}
+
+                {hasAnyPermissions(auth.permissions, ['category.index']) && (
+                    <NavLink
+                        url={route('category.index')}
+                        active={url.startsWith('/categories')}
+                        title="Kategori Tools"
+                        icon={IconCategory2}
+                    />
+                )}
+
+                {hasAnyPermissions(auth.permissions, ['tools.index']) && (
+                    <NavLink
+                        url={route('tools.index')}
+                        active={url.startsWith('/tools')}
+                        title="Tools"
+                        icon={IconTools}
+                    />
+                )}
+
+                {hasAnyPermissions(auth.permissions, ['roles.index']) && (
+                    <NavLink
+                        url={route('roles.index')}
+                        active={url.startsWith('/roles')}
+                        title="Roles"
+                        icon={IconShieldCode}
+                    />
+                )}
+
+                {hasAnyPermissions(auth.permissions, ['users.index']) && (
+                    <NavLink
+                        url={route('users.index')}
+                        active={url.startsWith('/users')}
+                        title="Pengguna"
+                        icon={IconUsers}
+                    />
+                )}
 
                 {/* Lainnya */}
                 <div className="px-3 py-1 text-base font-medium text-white">Lainnya</div>
-                <NavLink url={'#'} active={url.startsWith('/users')} title="Akun" icon={IconUser} />
 
+                {/* Profile tidak membutuhkan permission khusus */}
+                <NavLink
+                    url={route('profile.edit', [auth.user.id])}
+                    active={url.startsWith('/profile')}
+                    title="Akun"
+                    icon={IconUser}
+                />
+
+                {/* Logout tidak membutuhkan permission */}
                 <NavLink
                     url={route('logout')}
                     method="post"
                     as="button"
                     active={url.startsWith('/logout')}
-                    title={'Logout'}
+                    title="Logout"
                     className="w-full"
                     icon={IconLogout2}
                 />

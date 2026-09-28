@@ -55,6 +55,7 @@ export default function EditToolModal({
     const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
 
     const objectUrlsRef = useRef([]);
+    const isRestoringRef = useRef(false);
 
     /*
      * ============================================================
@@ -115,6 +116,8 @@ export default function EditToolModal({
     useEffect(() => {
         if (!open || !tool) return;
 
+        isRestoringRef.current = true;
+
         const savedText = textDraftKey ? localStorage.getItem(textDraftKey) : null;
 
         const toolData = {
@@ -138,7 +141,12 @@ export default function EditToolModal({
             }),
         };
 
-        const restoredText = savedText ? JSON.parse(savedText) : toolData;
+        const savedData = savedText ? JSON.parse(savedText) : {};
+
+        const restoredText = {
+            ...toolData,
+            ...savedData,
+        };
 
         setData({
             ...restoredText,
@@ -183,6 +191,9 @@ export default function EditToolModal({
             });
 
             setImages([...existingImages, ...restoredNewImages]);
+
+            // Restore selesai
+            isRestoringRef.current = false;
         })();
     }, [open, tool, categories, method, textDraftKey, imageDraftKey]);
 
@@ -210,6 +221,8 @@ export default function EditToolModal({
 
     useEffect(() => {
         if (!open || !textDraftKey) return;
+
+        if (isRestoringRef.current) return;
 
         const { _method, ...toSave } = data;
 
