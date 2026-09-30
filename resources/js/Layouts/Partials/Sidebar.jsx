@@ -49,8 +49,13 @@ export default function Sidebar({ auth, url }) {
                 {/* Grup: Aktivitas */}
                 <div className="px-3 py-2 text-base font-medium text-white">Aktivitas</div>
 
-                {hasAnyPermissions(auth.permissions, ['stock_opname.index']) && (
-                    <NavLink url="#" title="Stock Opname" icon={IconPencilCheck} />
+                {hasAnyPermissions(auth.permissions, ['stock-opnames.index']) && (
+                    <NavLink
+                        active={url.startsWith('/stock-opnames')}
+                        url={route('stock-opnames.index')}
+                        title="Stock Opname"
+                        icon={IconPencilCheck}
+                    />
                 )}
 
                 {hasAnyPermissions(auth.permissions, ['loans.index']) && (

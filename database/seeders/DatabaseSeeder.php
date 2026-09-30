@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             FlashdiskSeeder::class,
             ChargerSeeder::class,
             ConverterSeeder::class,
+            StockOpnameSeeder::class,
         ]);
     }
 }

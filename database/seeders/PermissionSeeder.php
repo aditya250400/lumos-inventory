@@ -19,9 +19,9 @@ class PermissionSeeder extends Seeder
         $resources = [
             'category',
             'location',
-            'stock_opname',
+            'stock-opnames',
             'tools',
-            'stock_opname_details',
+            'stock-opname-details',
             'loans',
             'image',
             'tool_attribute',

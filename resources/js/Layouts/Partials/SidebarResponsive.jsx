@@ -50,8 +50,13 @@ export default function SidebarResponsive({ auth, url }) {
                 {/* Grup: Aktivitas */}
                 <div className="px-3 py-2 text-base font-medium text-white">Aktivitas</div>
 
-                {hasAnyPermissions(auth.permissions, ['stock_opname.index']) && (
-                    <NavLink url="#" title="Stock Opname" icon={IconPencilCheck} />
+                {hasAnyPermissions(auth.permissions, ['stock-opnames.index']) && (
+                    <NavLink
+                        url={route('stock-opnames.index')}
+                        active={url.startsWith('/stock-opnames')}
+                        title="Stock Opname"
+                        icon={IconPencilCheck}
+                    />
                 )}
 
                 {hasAnyPermissions(auth.permissions, ['loans.index']) && (

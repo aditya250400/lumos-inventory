@@ -27,10 +27,10 @@ class RoleSeeder extends Seeder
             'location.update',
             'location.delete',
 
-            'stock_opname.index',
-            'stock_opname.create',
-            'stock_opname.update',
-            'stock_opname.delete',
+            'stock-opnames.index',
+            'stock-opnames.create',
+            'stock-opnames.update',
+            'stock-opnames.delete',
 
             'tools.index',
             'tools.create',
@@ -47,10 +47,10 @@ class RoleSeeder extends Seeder
             'users.update',
             'users.delete',
 
-            'stock_opname_details.index',
-            'stock_opname_details.create',
-            'stock_opname_details.update',
-            'stock_opname_details.delete',
+            'stock-opname-details.index',
+            'stock-opname-details.create',
+            'stock-opname-details.update',
+            'stock-opname-details.delete',
 
             'loans.index',
             'loans.create',

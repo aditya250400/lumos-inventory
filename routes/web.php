@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\ToolController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -123,6 +124,15 @@ Route::middleware('auth')->group(function () {
         Route::get('users/edit/{user}', 'edit')->name('users.edit')->middleware('permission:users.index');
         Route::put('users/edit/{user}', 'update')->name('users.update')->middleware('permission:users.index');
         Route::delete('users/destroy/{user}', 'destroy')->name('users.destroy')->middleware('permission:users.index');
+    });
+
+    // users
+    Route::controller(StockOpnameController::class)->group(function () {
+        Route::get('stock-opnames', 'index')->name('stock-opnames.index')->middleware('permission:stock-opnames.index');
+        Route::get('stock-opnames/create', 'create')->name('stock-opnames.create')->middleware('permission:stock-opnames.index');
+        Route::get('stock-opnames/{location:slug}', 'show')->name('stock-opnames.show')->middleware('permission:stock-opnames.index');
+        Route::post('stock-opnames/create', 'store')->name('stock-opnames.store')->middleware('permission:stock-opnames.index');
+        Route::delete('stock-opnames/destroy/{stockOpname}', 'destroy')->name('stock-opnames.destroy')->middleware('permission:stock-opnames.index');
     });
 });
 
