@@ -39,11 +39,11 @@ class StockOpname extends Model
             })
 
             ->when($filters['date_from'] ?? null, function ($query, $dateFrom) {
-                $query->whereDate('opname_date', '>=', $dateFrom);
+                $query->whereDate('created_at', '>=', $dateFrom);
             })
 
             ->when($filters['date_to'] ?? null, function ($query, $dateTo) {
-                $query->whereDate('opname_date', '<=', $dateTo);
+                $query->whereDate('created_at', '<=', $dateTo);
             });;
     }
 

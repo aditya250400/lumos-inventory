@@ -2,10 +2,12 @@
 
 namespace App\Enums;
 
-enum LoanEnum: string
+enum DiscrepancyReasonEnum: string
 {
-    case LOAN = 'Dipinjam';
-    case RETURNED = 'Dikembalikan';
+    case USED = 'Terpakai';
+    case LOST = 'Hilang';
+    case DAMAGE = 'Rusak';
+    case NEWSTOCK = 'Stok Baru';
 
     public static function options()
     {

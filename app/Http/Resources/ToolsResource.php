@@ -78,16 +78,26 @@ class ToolsResource extends JsonResource
             }),
 
             'stock_opname_history' => $this->whenLoaded('stockOpnameDetails', function () {
-                return $this->stockOpnameDetails->map(fn($detail) => [
-                    'id' => $detail->id,
-                    'date' => optional($detail->stockOpname)->opname_date,
-                    'system_stock' => $detail->system_stock,
-                    'physical_stock' => $detail->physical_stock,
-                    'difference' => $detail->system_stock - $detail->physical_stock,
-                    'status' => $detail->status,
-                    'note' => $detail->note,
-                ]);
+                return $this->stockOpnameDetails->map(function ($detail) {
+                    $difference = $detail->physical_stock - $detail->system_stock;
+
+                    return [
+                        'id' => $detail->id,
+                        'date' => $detail->stockOpname?->created_at,
+                        'system_stock' => $detail->system_stock,
+                        'physical_stock' => $detail->physical_stock,
+                        'difference' => $difference,
+                        'status' => match (true) {
+                            $difference === 0 => 'Tidak ada selisih',
+                            $difference < 0 => 'Kurang ' . abs($difference),
+                            default => 'Lebih ' . $difference,
+                        },
+                        'discrepancy_reason' => $detail->discrepancy_reason,
+                        'note' => $detail->note,
+                    ];
+                });
             }),
+
 
             'loan_history' => $this->whenLoaded('loans', function () {
                 return $this->loans->map(fn($loan) => [

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StockOpnameEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('stock_opnames', function (Blueprint $table) {
             $table->id();
-            $table->date('opname_date');
+            $table->string('status')->default(StockOpnameEnum::DRAFT->value);
             $table->text('note')->nullable();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->foreignId('location_id')->constrained()->cascadeOnDelete();

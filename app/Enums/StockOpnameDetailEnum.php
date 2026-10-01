@@ -2,10 +2,11 @@
 
 namespace App\Enums;
 
-enum LoanEnum: string
+enum StockOpnameDetailEnum: string
 {
-    case LOAN = 'Dipinjam';
-    case RETURNED = 'Dikembalikan';
+    case MATCH = 'Cocok';
+    case LESS = 'Kurang';
+    case GREATER = 'Lebih';
 
     public static function options()
     {

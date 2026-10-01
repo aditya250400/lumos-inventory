@@ -11,6 +11,7 @@ use App\Models\Tool;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Enums\MessageType;
+use App\Enums\StockOpnameEnum;
 use App\Http\Requests\ToolRequest;
 use App\Http\Resources\ToolDetailResource;
 use App\Models\Image;
@@ -41,7 +42,14 @@ class ToolController extends Controller
                 'attributeValues.attribute',
                 'usedBy',
                 'stockOpnameDetails' => fn($query) =>
-                $query->with('stockOpname')->latest(),
+
+                $query
+                    ->whereHas('stockOpname', function ($q) {
+                        $q->where('status', StockOpnameEnum::DONE->value);
+                    })
+                    ->with([
+                        'stockOpname'
+                    ])->latest(),
                 'loans' => fn($query) =>
                 $query->with('loanBy')->latest(),
             ])

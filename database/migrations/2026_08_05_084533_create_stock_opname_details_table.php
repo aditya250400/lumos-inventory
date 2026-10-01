@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('system_stock');
             $table->integer('physical_stock');
             $table->string('status');
+            $table->string('discrepancy_reason')->nullable();
             $table->text('note')->nullable();
             $table->foreignId('tool_id')->constrained()->cascadeOnDelete();
             $table->foreignId('stock_opname_id')->constrained()->cascadeOnDelete();

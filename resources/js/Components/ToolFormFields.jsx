@@ -52,14 +52,6 @@ export default function ToolFormFields({
         ]);
     };
 
-    console.log(`Attribute tools ${data.name} :`);
-    console.log(categoryAttributes);
-
-    console.log(`Attribute value tools ${data.name} :`);
-    console.log(data.attributes);
-
-    console.log(`Id tool ${data.name} : ${data.id}`);
-
     return (
         <>
             <div className="space-y-6">

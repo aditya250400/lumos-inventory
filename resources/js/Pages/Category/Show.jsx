@@ -118,7 +118,6 @@ export default function Show(
      * Kolom dinamis diambil dari daftar definisi attribute kategori ini.
      */
     const dynamicColumns = useMemo(() => attributes.map((attr) => attr.field_name), [attributes]);
-    console.log(dynamicColumns);
 
     return (
         <>

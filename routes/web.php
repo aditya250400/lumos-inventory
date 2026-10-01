@@ -6,6 +6,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockOpnameController;
+use App\Http\Controllers\StockOpnameDetailController;
 use App\Http\Controllers\ToolController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -134,6 +135,12 @@ Route::middleware('auth')->group(function () {
         Route::post('stock-opnames/create', 'store')->name('stock-opnames.store')->middleware('permission:stock-opnames.index');
         Route::delete('stock-opnames/destroy/{stockOpname}', 'destroy')->name('stock-opnames.destroy')->middleware('permission:stock-opnames.index');
     });
+
+
+    // stock opname detail
+    Route::post('stock-opnames', [StockOpnameController::class, 'store'])->name('stock-opnames.store');
+    Route::put('stock-opnames/{stockOpname}/details', [StockOpnameDetailController::class, 'update'])
+        ->name('stock-opnames.details.update');
 });
 
 

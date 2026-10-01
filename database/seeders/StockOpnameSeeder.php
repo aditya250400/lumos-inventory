@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\StockOpnameDetailEnum;
 use App\Enums\StockOpnameEnum;
 use App\Models\StockOpname;
 use App\Models\StockOpnameDetail;
@@ -17,7 +18,7 @@ class StockOpnameSeeder extends Seeder
     {
         // Stock Opname 1
         $stockOpname1 = StockOpname::create([
-            'opname_date' => '2026-01-10',
+            'status' => StockOpnameEnum::DONE->value,
             'note' => 'Stock opname periode Januari',
             'created_by' => 1,
             'location_id' => 1,
@@ -26,7 +27,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 10,
             'physical_stock' => 10,
-            'status' => StockOpnameEnum::MATCH->value,
+            'status' => StockOpnameDetailEnum::MATCH->value,
             'note' => 'Stok sesuai',
             'tool_id' => 1,
             'stock_opname_id' => $stockOpname1->id,
@@ -35,7 +36,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 20,
             'physical_stock' => 18,
-            'status' => StockOpnameEnum::LESS->value,
+            'status' => StockOpnameDetailEnum::LESS->value,
             'note' => 'Stok fisik kurang 2',
             'tool_id' => 2,
             'stock_opname_id' => $stockOpname1->id,
@@ -44,7 +45,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 15,
             'physical_stock' => 17,
-            'status' => StockOpnameEnum::GREATER->value,
+            'status' => StockOpnameDetailEnum::GREATER->value,
             'note' => 'Stok fisik lebih 2',
             'tool_id' => 3,
             'stock_opname_id' => $stockOpname1->id,
@@ -52,7 +53,7 @@ class StockOpnameSeeder extends Seeder
 
         // Stock Opname 2
         $stockOpname2 = StockOpname::create([
-            'opname_date' => '2026-02-15',
+            'status' => StockOpnameEnum::DONE->value,
             'note' => 'Stock opname periode Februari',
             'created_by' => 1,
             'location_id' => 1,
@@ -61,7 +62,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 10,
             'physical_stock' => 10,
-            'status' => StockOpnameEnum::MATCH->value,
+            'status' => StockOpnameDetailEnum::MATCH->value,
             'note' => 'Stok sesuai',
             'tool_id' => 1,
             'stock_opname_id' => $stockOpname2->id,
@@ -70,7 +71,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 25,
             'physical_stock' => 20,
-            'status' => StockOpnameEnum::LESS->value,
+            'status' => StockOpnameDetailEnum::LESS->value,
             'note' => 'Stok fisik kurang 5',
             'tool_id' => 2,
             'stock_opname_id' => $stockOpname2->id,
@@ -78,7 +79,7 @@ class StockOpnameSeeder extends Seeder
 
         // Stock Opname 3
         $stockOpname3 = StockOpname::create([
-            'opname_date' => '2026-03-20',
+            'status' => StockOpnameEnum::DONE->value,
             'note' => 'Stock opname periode Maret',
             'created_by' => 1,
             'location_id' => 1,
@@ -87,7 +88,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 10,
             'physical_stock' => 8,
-            'status' => StockOpnameEnum::LESS->value,
+            'status' => StockOpnameDetailEnum::LESS->value,
             'note' => 'Stok fisik kurang 2',
             'tool_id' => 1,
             'stock_opname_id' => $stockOpname3->id,
@@ -96,7 +97,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 20,
             'physical_stock' => 20,
-            'status' => StockOpnameEnum::MATCH->value,
+            'status' => StockOpnameDetailEnum::MATCH->value,
             'note' => 'Stok sesuai',
             'tool_id' => 2,
             'stock_opname_id' => $stockOpname3->id,
@@ -105,14 +106,14 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 30,
             'physical_stock' => 27,
-            'status' => StockOpnameEnum::LESS->value,
+            'status' => StockOpnameDetailEnum::LESS->value,
             'note' => 'Stok fisik kurang 3',
             'tool_id' => 3,
             'stock_opname_id' => $stockOpname3->id,
         ]);
         // Stock Opname 4
         $stockOpname4 = StockOpname::create([
-            'opname_date' => '2026-07-21',
+            'status' => StockOpnameEnum::DONE->value,
             'note' => 'Stock opname periode Juli',
             'created_by' => 1,
             'location_id' => 1,
@@ -121,7 +122,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 10,
             'physical_stock' => 10,
-            'status' => StockOpnameEnum::LESS->value,
+            'status' => StockOpnameDetailEnum::LESS->value,
             'note' => 'cocok',
             'tool_id' => 1,
             'stock_opname_id' => $stockOpname4->id,
@@ -130,7 +131,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 20,
             'physical_stock' => 20,
-            'status' => StockOpnameEnum::MATCH->value,
+            'status' => StockOpnameDetailEnum::MATCH->value,
             'note' => 'Stok sesuai',
             'tool_id' => 2,
             'stock_opname_id' => $stockOpname4->id,
@@ -139,7 +140,7 @@ class StockOpnameSeeder extends Seeder
         StockOpnameDetail::create([
             'system_stock' => 30,
             'physical_stock' => 30,
-            'status' => StockOpnameEnum::LESS->value,
+            'status' => StockOpnameDetailEnum::LESS->value,
             'note' => 'Sesuai',
             'tool_id' => 3,
             'stock_opname_id' => $stockOpname4->id,

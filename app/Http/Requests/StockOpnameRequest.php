@@ -7,23 +7,22 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StockOpnameRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true; // sebelumnya `false` -> semua request bakal ke-reject 403
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            //
+            'location_id' => ['required', 'integer', 'exists:locations,id'],
+            'note' => ['nullable', 'string', 'max:1000'],
+
+            // cuma relevan kalau location_id yang dipilih adalah lokasi induk (punya children)
+            'include_children' => ['nullable', 'boolean'],
         ];
     }
 }

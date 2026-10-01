@@ -1,75 +1,16 @@
-import AlertAction from '@/Components/AlertAction';
-import EditToolModal from '@/Components/EditToolModal';
+import ClientPagination, { useClientPagination } from '@/Components/ClientPagination';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Dialog, DialogContent, DialogTitle } from '@/Components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
-import AppLayout from '@/Layouts/AppLayout';
-import hasAnyPermissions, { deleteAction, formatDateIndo } from '@/lib/utils';
-import { Link } from '@inertiajs/react';
-import {
-    IconArrowLeft,
-    IconChevronLeft,
-    IconChevronRight,
-    IconPencil,
-    IconPhoto,
-    IconTrash,
-} from '@tabler/icons-react';
+import { formatDateIndo } from '@/lib/utils';
+import { IconChevronLeft, IconChevronRight, IconPhoto } from '@tabler/icons-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-const PER_PAGE = 5;
-
-function usePagedList(items) {
-    const [page, setPage] = useState(1);
-
-    const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));
-
-    const paged = useMemo(() => items.slice((page - 1) * PER_PAGE, page * PER_PAGE), [items, page]);
-
-    return {
-        page,
-        setPage,
-        totalPages,
-        paged,
-    };
-}
-
-function TablePagination({ page, setPage, totalPages, total, label }) {
-    if (total === 0) return null;
-
-    return (
-        <div className="flex flex-col items-center justify-between gap-y-2 border-t px-4 py-3 lg:flex-row">
-            <p className="text-sm text-muted-foreground">
-                Menampilkan {total === 0 ? 0 : (page - 1) * PER_PAGE + 1}-{Math.min(page * PER_PAGE, total)} dari{' '}
-                {total} {label}
-            </p>
-
-            {totalPages > 1 && (
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
-                        <IconChevronLeft className="size-4" />
-                    </Button>
-
-                    <span className="rounded-md bg-blue-600 px-3 py-1 text-sm text-white">{page}</span>
-
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        disabled={page === totalPages}
-                        onClick={() => setPage((p) => p + 1)}
-                    >
-                        <IconChevronRight className="size-4" />
-                    </Button>
-                </div>
-            )}
-        </div>
-    );
-}
-
 export default function ToolDetailModal({ open, onOpenChange, tool }) {
-    const opname = usePagedList(tool?.stock_opname_history ?? []);
+    const opnames = useClientPagination(tool?.stock_opname_history ?? [], 10);
 
-    const loans = usePagedList(tool?.loan_history ?? []);
+    const loans = useClientPagination(tool?.loan_history ?? [], 10);
 
     /*
      * ============================================================
@@ -410,7 +351,7 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                             <CardContent className="p-0">
                                 <p className="p-4 text-sm font-semibold">Riwayat Stock Opname</p>
 
-                                <Table>
+                                <Table className="overflow-x-auto">
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead className="px-4">#</TableHead>
@@ -424,13 +365,14 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                             <TableHead>Selisih</TableHead>
 
                                             <TableHead>Status</TableHead>
+                                            <TableHead>Alasan Perbedaan Stok</TableHead>
 
                                             <TableHead>Catatan</TableHead>
                                         </TableRow>
                                     </TableHeader>
 
                                     <TableBody>
-                                        {opname.paged.length === 0 ? (
+                                        {opnames.pagedItems.length === 0 ? (
                                             <TableRow>
                                                 <TableCell
                                                     colSpan={7}
@@ -440,10 +382,10 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
-                                            opname.paged.map((row, index) => (
+                                            opnames.pagedItems.map((row, index) => (
                                                 <TableRow key={row.id}>
                                                     <TableCell className="px-4">
-                                                        {(opname.page - 1) * PER_PAGE + index + 1}
+                                                        {(opnames.page - 1) * opnames.perPage + index + 1}
                                                     </TableCell>
 
                                                     <TableCell>{formatDateIndo(row.date)}</TableCell>
@@ -455,6 +397,7 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                                     <TableCell>{row.difference}</TableCell>
 
                                                     <TableCell>{row.status}</TableCell>
+                                                    <TableCell>{row.discrepancy_reason || '-'}</TableCell>
 
                                                     <TableCell>{row.note || '-'}</TableCell>
                                                 </TableRow>
@@ -462,12 +405,13 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                         )}
                                     </TableBody>
                                 </Table>
-
-                                <TablePagination
-                                    page={opname.page}
-                                    setPage={opname.setPage}
-                                    totalPages={opname.totalPages}
-                                    total={(tool?.stock_opname_history ?? []).length}
+                                <ClientPagination
+                                    page={opnames.page}
+                                    setPage={opnames.setPage}
+                                    totalPages={opnames.totalPages}
+                                    total={opnames.total}
+                                    from={opnames.from}
+                                    to={opnames.to}
                                     label="Riwayat Stock Opname"
                                 />
                             </CardContent>
@@ -499,7 +443,7 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                     </TableHeader>
 
                                     <TableBody>
-                                        {loans.paged.length === 0 ? (
+                                        {loans.pagedItems.length === 0 ? (
                                             <TableRow>
                                                 <TableCell
                                                     colSpan={6}
@@ -509,10 +453,10 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
-                                            loans.paged.map((row, index) => (
+                                            loans.pagedItems.map((row, index) => (
                                                 <TableRow key={row.id}>
                                                     <TableCell className="px-4">
-                                                        {(loans.page - 1) * PER_PAGE + index + 1}
+                                                        {(loans.page - 1) * loans.perPage + index + 1}
                                                     </TableCell>
 
                                                     <TableCell>{row.loan_code}</TableCell>
@@ -532,12 +476,14 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                     </TableBody>
                                 </Table>
 
-                                <TablePagination
+                                <ClientPagination
                                     page={loans.page}
                                     setPage={loans.setPage}
                                     totalPages={loans.totalPages}
-                                    total={(tool?.loan_history ?? []).length}
-                                    label="Riwayat Peminjaman"
+                                    total={loans.total}
+                                    from={loans.from}
+                                    to={loans.to}
+                                    label="Riwayat Stock Opname"
                                 />
                             </CardContent>
                         </Card>

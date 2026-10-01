@@ -17,8 +17,20 @@ class StockOpnameResource extends JsonResource
         return [
             'id' => $this->id,
             'difference_count' => $this->difference_count,
-            'opname_date' => $this->opname_date,
+            'created_at' => $this->created_at,
+            'status' => $this->status,
             'note' => $this->note,
+            'details' => $this->whenLoaded('details', fn() => $this->details->map(fn($detail) => [
+                'id' => $detail->id,
+                'tool_id' => $detail->tool_id,
+                'tool_code' => $detail->tool->tool_code,
+                'tool_name' => $detail->tool->name,
+                'system_stock' => $detail->system_stock,
+                'physical_stock' => $detail->physical_stock,
+                'status' => $detail->status,
+                'discrepancy_reason' => $detail->discrepancy_reason,
+                'note' => $detail->note,
+            ])),
             'createdBy' => $this->whenLoaded('createdBy', function () {
                 return [
                     'id' => $this->createdBy->id,

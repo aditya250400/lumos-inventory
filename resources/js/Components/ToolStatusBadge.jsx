@@ -25,6 +25,14 @@ export const TOOL_STATUS_STYLES = {
         label: 'Hilang',
         className: 'border-gray-200 bg-gray-100 text-gray-700 hover:bg-gray-100',
     },
+    Selesai: {
+        label: 'Selesai',
+        className: 'border-green-200 bg-green-100 text-green-700 hover:bg-green-100',
+    },
+    Draft: {
+        label: 'Draft',
+        className: 'border-red-200 bg-red-100 text-red-700 hover:bg-red-100',
+    },
 };
 
 export function getToolStatusStyle(status) {

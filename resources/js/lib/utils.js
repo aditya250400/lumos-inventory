@@ -10,7 +10,13 @@ export function cn(...inputs) {
 }
 
 export const formatDateIndo = (dateString) => {
-    return format(parseISO(dateString), 'eeee, dd MMM yyy', { locale: id });
+    const date = parseISO(dateString);
+
+    if (dateString.length === 10) {
+        return format(date, 'eeee, dd MMM yyy', { locale: id });
+    }
+
+    return format(date, 'eeee, dd MMM yyy HH:mm', { locale: id });
 };
 
 export default function hasAnyPermissions(allPermissions, permissions) {

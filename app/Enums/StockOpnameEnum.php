@@ -4,9 +4,8 @@ namespace App\Enums;
 
 enum StockOpnameEnum: string
 {
-    case MATCH = 'Cocok';
-    case LESS = 'Kurang';
-    case GREATER = 'Lebih';
+    case DRAFT = 'Draft';
+    case DONE = 'Selesai';
 
     public static function options()
     {

@@ -450,6 +450,7 @@ export default function Show({ auth, tool, users, categories, locations, invento
                                     <TableHead>Selisih</TableHead>
 
                                     <TableHead>Status</TableHead>
+                                    <TableHead>Alasan Perbedaan Stok</TableHead>
 
                                     <TableHead>Catatan</TableHead>
                                 </TableRow>
@@ -478,6 +479,7 @@ export default function Show({ auth, tool, users, categories, locations, invento
                                             <TableCell>{row.difference}</TableCell>
 
                                             <TableCell>{row.status}</TableCell>
+                                            <TableCell>{row.discrepancy_reason}</TableCell>
 
                                             <TableCell>{row.note || '-'}</TableCell>
                                         </TableRow>
