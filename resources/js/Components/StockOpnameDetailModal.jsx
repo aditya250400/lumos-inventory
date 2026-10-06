@@ -9,7 +9,7 @@ import {
 } from '@/Components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { formatDateIndo } from '@/lib/utils';
-import { IconFilter, IconPrinter } from '@tabler/icons-react';
+import { IconDownload, IconFilter, IconPdf, IconPrinter } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import ToolStatusBadge from './ToolStatusBadge';
 import ClientPagination, { useClientPagination } from './ClientPagination';
@@ -72,9 +72,9 @@ export default function StockOpnameDetailModal({ open, onOpenChange, stockOpname
                             </DialogDescription>
                         </div>
 
-                        <Button type="button" variant="slate" onClick={() => window.print()} className="shrink-0">
-                            <IconPrinter className="size-4" />
-                            Cetak
+                        <Button type="button" variant="slate" onClick={() => alert('Cetak')} className="shrink-0">
+                            <IconDownload className="size-4" />
+                            Download PDF
                         </Button>
                     </div>
                 </DialogHeader>
@@ -82,9 +82,9 @@ export default function StockOpnameDetailModal({ open, onOpenChange, stockOpname
                 {/* SUMMARY */}
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                     <div className="rounded-lg border p-3">
-                        <p className="text-xs text-muted-foreground">Tanggal</p>
+                        <p className="text-xs text-muted-foreground">Dibuat Oleh</p>
 
-                        <p className="mt-1 font-semibold">{formatDateIndo(stockOpname.created_at)}</p>
+                        <p className="mt-1 font-semibold">{stockOpname.createdBy.name}</p>
                     </div>
 
                     <div className="rounded-lg border p-3">
@@ -149,7 +149,7 @@ export default function StockOpnameDetailModal({ open, onOpenChange, stockOpname
                                 <TableHead className="text-center">Stok Sistem</TableHead>
                                 <TableHead className="text-center">Stok Fisik</TableHead>
                                 <TableHead className="text-center">Selisih</TableHead>
-                                <TableHead>Alasan Perbedaan</TableHead>
+                                <TableHead>Alasan Perbedaan Stok</TableHead>
                                 <TableHead>Catatan</TableHead>
                             </TableRow>
                         </TableHeader>

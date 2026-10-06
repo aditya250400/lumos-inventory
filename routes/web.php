@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\StockOpnameDetailController;
@@ -127,20 +128,26 @@ Route::middleware('auth')->group(function () {
         Route::delete('users/destroy/{user}', 'destroy')->name('users.destroy')->middleware('permission:users.index');
     });
 
-    // users
+    // stock opnames
     Route::controller(StockOpnameController::class)->group(function () {
         Route::get('stock-opnames', 'index')->name('stock-opnames.index')->middleware('permission:stock-opnames.index');
-        Route::get('stock-opnames/create', 'create')->name('stock-opnames.create')->middleware('permission:stock-opnames.index');
-        Route::get('stock-opnames/{location:slug}', 'show')->name('stock-opnames.show')->middleware('permission:stock-opnames.index');
-        Route::post('stock-opnames/create', 'store')->name('stock-opnames.store')->middleware('permission:stock-opnames.index');
+        Route::post('stock-opnames', [StockOpnameController::class, 'store'])->name('stock-opnames.store');
         Route::delete('stock-opnames/destroy/{stockOpname}', 'destroy')->name('stock-opnames.destroy')->middleware('permission:stock-opnames.index');
     });
 
 
     // stock opname detail
-    Route::post('stock-opnames', [StockOpnameController::class, 'store'])->name('stock-opnames.store');
     Route::put('stock-opnames/{stockOpname}/details', [StockOpnameDetailController::class, 'update'])
         ->name('stock-opnames.details.update');
+
+
+
+    // reports
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/tools/export/excel', [ReportController::class, 'exportToolsExcel'])->name('reports.tools.export.excel');
+    Route::get('reports/tools/export/pdf', [ReportController::class, 'exportToolsPdf'])->name('reports.tools.export.pdf');
+    Route::get('reports/stock-opnames/export/excel', [ReportController::class, 'exportStockOpnamesExcel'])->name('reports.stock-opnames.export.excel');
+    Route::get('reports/stock-opnames/export/pdf', [ReportController::class, 'exportStockOpnamesPdf'])->name('reports.stock-opnames.export.pdf');
 });
 
 

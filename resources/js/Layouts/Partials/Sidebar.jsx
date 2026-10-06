@@ -63,7 +63,12 @@ export default function Sidebar({ auth, url }) {
                 )}
 
                 {/* Belum ada permission laporan di PermissionSeeder */}
-                <NavLink url="#" title="Laporan" icon={IconFileText} />
+                <NavLink
+                    url={route('reports.index')}
+                    title="Laporan"
+                    icon={IconFileText}
+                    active={url.startsWith('/reports')}
+                />
 
                 {/* Belum ada permission cetak dokumen di PermissionSeeder */}
                 <NavLink url="#" title="Cetak Dokumen" icon={IconPrinter} />

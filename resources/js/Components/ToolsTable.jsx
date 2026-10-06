@@ -74,8 +74,7 @@ export default function ToolsTable({
                         onClick={() => onDetailTrigger(tool)}
                         className="hover:cursor-pointer hover:bg-muted"
                     >
-                        {/* <TableCell>{index + 1 + (meta.current_page - 1) * meta.per_page}</TableCell> */}
-                        <TableCell>{tool.id}</TableCell>
+                        <TableCell>{index + 1 + (meta.current_page - 1) * meta.per_page}</TableCell>
 
                         <TableCell>{tool.tool_code}</TableCell>
 

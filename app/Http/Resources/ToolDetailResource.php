@@ -56,7 +56,7 @@ class ToolDetailResource extends JsonResource
 
             'stock_opname_history' => $this->whenLoaded('stockOpnameDetails', fn() => $this->stockOpnameDetails->map(fn($detail) => [
                 'id' => $detail->id,
-                'date' => optional($detail->stockOpname)->opname_date,
+                'date' => optional($detail->stockOpname)->created_at,
                 'system_stock' => $detail->system_stock,
                 'physical_stock' => $detail->physical_stock,
                 'difference' => $detail->system_stock - $detail->physical_stock,
