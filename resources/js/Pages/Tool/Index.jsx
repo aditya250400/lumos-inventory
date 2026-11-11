@@ -57,8 +57,8 @@ export default function Index(props) {
 
     return (
         <>
-            <div className="flex w-full flex-col pb-32">
-                <div className="mb-8 flex flex-col items-start justify-between gap-y-4 lg:flex-row lg:items-center">
+            <div className="flex flex-col w-full pb-32">
+                <div className="flex flex-col items-start justify-between mb-8 gap-y-4 lg:flex-row lg:items-center">
                     <HeaderTitle
                         title={props.page_settings.title}
                         subtitle={props.page_settings.subtitle}
@@ -77,8 +77,8 @@ export default function Index(props) {
                 </div>
                 <Card>
                     <CardHeader className={'mb-4 p-0'}>
-                        <div className="flex w-full flex-col gap-4 px-6 py-4 lg:flex-row lg:items-center">
-                            <div className="flex w-full flex-col gap-2 lg:flex-row lg:items-center">
+                        <div className="flex flex-col w-full gap-4 px-6 py-4 lg:flex-row lg:items-center">
+                            <div className="flex flex-col w-full gap-2 lg:flex-row lg:items-center">
                                 <Input
                                     size="sm"
 
@@ -161,13 +161,14 @@ export default function Index(props) {
                                 onSortable={onSortable}
                                 onDetailTrigger={onDetailTrigger}
                                 showNote={true}
+                                onAction={true}
                                 onEditTrigger={onEditTrigger}
                                 showCategory={true}
                             />
                         )}
                     </CardContent>
 
-                    <CardFooter className="flex w-full flex-col items-center justify-between gap-y-2 border-t py-3 lg:flex-row">
+                    <CardFooter className="flex flex-col items-center justify-between w-full py-3 border-t gap-y-2 lg:flex-row">
                         <p className="text-sm text-muted-foreground">
                             Menampilkan <span className="font-medium text-blue-600">{toolsMeta.to ?? 0}</span> dari{' '}
                             {toolsMeta.total} tools

@@ -18,6 +18,7 @@ export default function ToolsTable({
     onDetailTrigger,
     showCategory = false,
     showNote = false,
+    onAction = false,
 }) {
     return (
         <Table className="w-full">
@@ -54,7 +55,7 @@ export default function ToolsTable({
 
                     {/* Dynamic attributes */}
                     {dynamicColumns.map((column) => (
-                        <TableHead key={column} className="bg-blue-50 text-blue-700">
+                        <TableHead key={column} className="text-blue-700 bg-blue-50">
                             {column}
                         </TableHead>
                     ))}
@@ -63,7 +64,7 @@ export default function ToolsTable({
                     <TableHead>
                         <SortableHead label="Dibuat pada" field="created_at" onSortable={onSortable} />
                     </TableHead>
-                    <TableHead>Aksi</TableHead>
+                    {onAction && <TableHead>Aksi</TableHead>}
                 </TableRow>
             </TableHeader>
 
@@ -131,30 +132,28 @@ export default function ToolsTable({
 
                         <TableCell>{formatDateIndo(tool.created_at)}</TableCell>
 
-                        <TableCell onClick={(e) => e.stopPropagation()}>
-                            <div className="flex items-center justify-center gap-x-1">
-                                {/* <Button onClick={() => onDetailTrigger(tool)} variant="purple" size="sm">
-                                    <IconLocationSearch size="4" />
-                                    Detail
-                                </Button> */}
-                                {hasAnyPermissions(auth.permissions, ['tools.update', [tool]]) && onEditTrigger && (
-                                    <Button onClick={() => onEditTrigger(tool)} variant="blue" size="sm">
-                                        <IconPencil size="4" />
-                                        Edit
-                                    </Button>
-                                )}
-                                {hasAnyPermissions(auth.permissions, ['tools.delete']) && (
-                                    <AlertAction
-                                        trigger={
-                                            <Button variant="red" size="sm">
-                                                <IconTrash className="size-4" /> Delete
-                                            </Button>
-                                        }
-                                        action={() => deleteAction(route('tools.destroy', [tool]))}
-                                    />
-                                )}
-                            </div>
-                        </TableCell>
+                        {onAction && (
+                            <TableCell onClick={(e) => e.stopPropagation()}>
+                                <div className="flex items-center justify-center gap-x-1">
+                                    {hasAnyPermissions(auth.permissions, ['tools.update', [tool]]) && onEditTrigger && (
+                                        <Button onClick={() => onEditTrigger(tool)} variant="blue" size="sm">
+                                            <IconPencil size="4" />
+                                            Edit
+                                        </Button>
+                                    )}
+                                    {hasAnyPermissions(auth.permissions, ['tools.delete']) && (
+                                        <AlertAction
+                                            trigger={
+                                                <Button variant="red" size="sm">
+                                                    <IconTrash className="size-4" /> Delete
+                                                </Button>
+                                            }
+                                            action={() => deleteAction(route('tools.destroy', [tool]))}
+                                        />
+                                    )}
+                                </div>
+                            </TableCell>
+                        )}
                     </TableRow>
                 ))}
             </TableBody>
@@ -167,7 +166,7 @@ function SortableHead({ label, field, onSortable }) {
         <Button variant="ghost" onClick={() => onSortable?.(field)}>
             {label}
 
-            <span className="ml-2 flex-none rounded text-muted-foreground">
+            <span className="flex-none ml-2 rounded text-muted-foreground">
                 <IconArrowsDownUp className="size-4" />
             </span>
         </Button>

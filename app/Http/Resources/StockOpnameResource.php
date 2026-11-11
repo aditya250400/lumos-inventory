@@ -20,6 +20,7 @@ class StockOpnameResource extends JsonResource
             'created_at' => $this->created_at,
             'status' => $this->status,
             'note' => $this->note,
+            'mismatch_count' => $this->mismatch_count ?? null,
             'details' => $this->whenLoaded('details', fn() => $this->details->map(fn($detail) => [
                 'id' => $detail->id,
                 'tool_id' => $detail->tool_id,

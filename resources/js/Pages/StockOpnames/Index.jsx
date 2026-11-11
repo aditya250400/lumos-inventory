@@ -167,7 +167,9 @@ export default function Index(props) {
                             {/* DATE */}
                             <div className="flex items-center gap-2">
                                 <div className="w-full xl:flex xl:w-fit xl:items-center xl:gap-x-1">
-                                    <Label htmlFor="date_from">Dari</Label>
+                                    <Label htmlFor="date_from" className="md:hidden">
+                                        Dari
+                                    </Label>
 
                                     <Input
                                         id="date_from"
@@ -181,9 +183,12 @@ export default function Index(props) {
                                         }
                                     />
                                 </div>
+                                <span className="hidden text-sm text-muted-foreground md:block">s/d</span>
 
                                 <div className="w-full xl:flex xl:w-fit xl:items-center xl:gap-x-1">
-                                    <Label htmlFor="date_to">Sampai</Label>
+                                    <Label htmlFor="date_to" className="md:hidden">
+                                        Sampai
+                                    </Label>
 
                                     <Input
                                         id="date_to"
