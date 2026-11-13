@@ -162,7 +162,7 @@ export default function Index(props) {
 
     return (
         <>
-            <div className="flex w-full flex-col pb-32">
+            <div className="flex flex-col w-full pb-32">
                 <div className="mb-6">
                     <HeaderTitle
                         title={props.page_settings.title}
@@ -192,9 +192,9 @@ export default function Index(props) {
                 </div>
 
                 <Card>
-                    <CardHeader className="mb-4 p-0">
-                        <div className="flex w-full flex-col gap-4 px-6 py-4 md:flex-row md:items-center">
-                            <div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
+                    <CardHeader className="p-0 mb-4">
+                        <div className="flex flex-col w-full gap-4 px-6 py-4 md:flex-row md:items-center">
+                            <div className="flex flex-col w-full gap-2 md:flex-row md:items-center">
                                 {props.report_type === 'stock-opnames' && (
                                     <>
                                         <Select
@@ -359,7 +359,7 @@ export default function Index(props) {
                         {/* Ringkasan */}
                         {props.report_type === 'tools' ? (
                             <>
-                                <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-2">
+                                <div className="grid grid-cols-2 gap-3 mb-5 lg:grid-cols-2">
                                     <StatCard icon={IconStack2} value={props.summary.total_tools} label="Total Tools" />
                                     <StatCard
                                         icon={IconPackages}
@@ -369,7 +369,7 @@ export default function Index(props) {
                                 </div>
                             </>
                         ) : (
-                            <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-3">
+                            <div className="grid grid-cols-2 gap-3 mb-5 lg:grid-cols-3">
                                 <StatCard
                                     icon={IconListCheck}
                                     value={props.summary.session_count}
@@ -416,11 +416,11 @@ export default function Index(props) {
                                             <TableHead>
                                                 <Button
                                                     variant="ghost"
-                                                    className="group inline-flex"
+                                                    className="inline-flex group"
                                                     onClick={() => onSortable('id')}
                                                 >
                                                     #
-                                                    <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                    <span className="flex-none ml-2 rounded text-muted-foreground">
                                                         <IconArrowsDownUp className="size-4" />
                                                     </span>
                                                 </Button>
@@ -429,11 +429,11 @@ export default function Index(props) {
                                             <TableHead>
                                                 <Button
                                                     variant="ghost"
-                                                    className="group inline-flex"
+                                                    className="inline-flex group"
                                                     onClick={() => onSortable('created_at')}
                                                 >
                                                     Tanggal SO
-                                                    <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                    <span className="flex-none ml-2 rounded text-muted-foreground">
                                                         <IconArrowsDownUp className="size-4" />
                                                     </span>
                                                 </Button>
@@ -442,11 +442,11 @@ export default function Index(props) {
                                             <TableHead>
                                                 <Button
                                                     variant="ghost"
-                                                    className="group inline-flex"
+                                                    className="inline-flex group"
                                                     onClick={() => onSortable('status')}
                                                 >
                                                     Status
-                                                    <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                    <span className="flex-none ml-2 rounded text-muted-foreground">
                                                         <IconArrowsDownUp className="size-4" />
                                                     </span>
                                                 </Button>
@@ -455,11 +455,11 @@ export default function Index(props) {
                                             <TableHead>
                                                 <Button
                                                     variant="ghost"
-                                                    className="group inline-flex"
+                                                    className="inline-flex group"
                                                     onClick={() => onSortable('location_id')}
                                                 >
                                                     Lokasi
-                                                    <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                    <span className="flex-none ml-2 rounded text-muted-foreground">
                                                         <IconArrowsDownUp className="size-4" />
                                                     </span>
                                                 </Button>
@@ -468,11 +468,11 @@ export default function Index(props) {
                                             <TableHead>
                                                 <Button
                                                     variant="ghost"
-                                                    className="group inline-flex"
+                                                    className="inline-flex group"
                                                     onClick={() => onSortable('created_by')}
                                                 >
                                                     Dibuat Oleh
-                                                    <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                    <span className="flex-none ml-2 rounded text-muted-foreground">
                                                         <IconArrowsDownUp className="size-4" />
                                                     </span>
                                                 </Button>
@@ -482,10 +482,10 @@ export default function Index(props) {
                                                 <Button
                                                     onClick={() => onSortable('difference_count')}
                                                     variant="ghost"
-                                                    className="group inline-flex"
+                                                    className="inline-flex group"
                                                 >
                                                     Selisih
-                                                    <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                    <span className="flex-none ml-2 rounded text-muted-foreground">
                                                         <IconArrowsDownUp className="size-4" />
                                                     </span>
                                                 </Button>
@@ -547,7 +547,7 @@ export default function Index(props) {
                         )}
                     </CardContent>
 
-                    <CardFooter className="flex w-full flex-col items-center justify-between gap-y-2 border-t py-3 lg:flex-row">
+                    <CardFooter className="flex flex-col items-center justify-between w-full py-3 border-t gap-y-2 lg:flex-row">
                         {props.report_type === 'tools' ? (
                             <>
                                 <p className="text-sm text-muted-foreground">
@@ -593,7 +593,7 @@ export default function Index(props) {
 
 function StatCard({ icon: Icon, value, label, warn = false }) {
     return (
-        <div className="flex items-center gap-3 rounded-lg border p-4">
+        <div className="flex items-center gap-3 p-4 border rounded-lg">
             <div
                 className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${
                     warn ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'

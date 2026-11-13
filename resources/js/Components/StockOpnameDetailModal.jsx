@@ -71,29 +71,24 @@ export default function StockOpnameDetailModal({ open, onOpenChange, stockOpname
                                 Detail pemeriksaan stok fisik pada lokasi {locationName}.
                             </DialogDescription>
                         </div>
-
-                        <Button type="button" variant="slate" onClick={() => alert('Cetak')} className="shrink-0">
-                            <IconDownload className="size-4" />
-                            Download PDF
-                        </Button>
                     </div>
                 </DialogHeader>
 
                 {/* SUMMARY */}
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    <div className="rounded-lg border p-3">
+                    <div className="p-3 border rounded-lg">
                         <p className="text-xs text-muted-foreground">Dibuat Oleh</p>
 
                         <p className="mt-1 font-semibold">{stockOpname.createdBy.name}</p>
                     </div>
 
-                    <div className="rounded-lg border p-3">
+                    <div className="p-3 border rounded-lg">
                         <p className="text-xs text-muted-foreground">Lokasi</p>
 
                         <p className="mt-1 font-semibold">{locationName}</p>
                     </div>
 
-                    <div className="rounded-lg border p-3">
+                    <div className="p-3 border rounded-lg">
                         <p className="text-xs text-muted-foreground">Status</p>
 
                         <div className="mt-1">
@@ -101,7 +96,7 @@ export default function StockOpnameDetailModal({ open, onOpenChange, stockOpname
                         </div>
                     </div>
 
-                    <div className="rounded-lg border p-3">
+                    <div className="p-3 border rounded-lg">
                         <p className="text-xs text-muted-foreground">Selisih</p>
 
                         <p className={`mt-1 font-semibold ${differenceCount > 0 ? 'text-red-500' : 'text-green-600'}`}>
@@ -112,10 +107,10 @@ export default function StockOpnameDetailModal({ open, onOpenChange, stockOpname
 
                 {/* NOTE */}
                 {stockOpname.note && (
-                    <div className="rounded-lg border bg-muted/30 p-3">
+                    <div className="p-3 border rounded-lg bg-muted/30">
                         <p className="text-xs font-medium text-muted-foreground">Catatan Stock Opname</p>
 
-                        <p className="mt-1 whitespace-pre-wrap text-sm">{stockOpname.note}</p>
+                        <p className="mt-1 text-sm whitespace-pre-wrap">{stockOpname.note}</p>
                     </div>
                 )}
 

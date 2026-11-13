@@ -35,7 +35,7 @@ class StockOpnameController extends Controller
             ->sorting(request()->only(['field', 'direction']))
             ->with(['createdBy', 'location', 'details.tool'])
             ->latest('created_at')
-            ->paginate(request()->input('load', 10));
+            ->paginate(request()->input('load', 50));
 
         return inertia('StockOpnames/Index', [
             'page_setting' => [
@@ -64,7 +64,7 @@ class StockOpnameController extends Controller
             'discrepancy_reasons' => DiscrepancyReasonEnum::options(),
             'state' => [
                 'page' => request()->page ?? 1,
-                'load' => 10,
+                'load' => 50,
                 'location' => request()->input('location', ''),
                 'created_by' => request()->input('created_by', ''),
                 'date_from' => request()->input('date_from', ''),
