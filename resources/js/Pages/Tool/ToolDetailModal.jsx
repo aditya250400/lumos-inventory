@@ -170,6 +170,7 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                     <Badge>{tool?.inventory_type === 'internal' ? 'Internal' : 'Eksternal'}</Badge>
 
                                     <Badge>{tool?.status}</Badge>
+                                    <Badge>{`${tool?.accessories_count > 0 ? tool?.accessories_count : 'Tidak ada'} kelengkapan`}</Badge>
                                 </div>
                             </div>
                         </div>
@@ -326,9 +327,40 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                             </div>
                                         </CardContent>
                                     </Card>
+                                    {/* KELENGKAPAN */}
+                                    <Card>
+                                        <CardContent className="pt-4">
+                                            <div className="mb-2 flex items-center justify-between">
+                                                <p className="text-sm font-semibold">Kelengkapan</p>
+
+                                                <span className="text-xs text-muted-foreground">
+                                                    {(tool?.accessories ?? []).length} Item
+                                                </span>
+                                            </div>
+
+                                            <div className="scroll-bar max-h-40 space-y-2 overflow-y-auto pr-1">
+                                                {(tool?.accessories ?? []).length === 0 ? (
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Tidak ada kelengkapan
+                                                    </p>
+                                                ) : (
+                                                    tool.accessories.map((acc, i) => (
+                                                        <div
+                                                            key={acc.id ?? `${acc.name}-${i}`}
+                                                            className="flex items-center gap-1 text-sm"
+                                                        >
+                                                            <span className="text-muted-foreground">{i + 1}.</span>
+
+                                                            <span className="font-medium">{acc.name}</span>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
 
                                     {/* CATATAN */}
-                                    <Card>
+                                    <Card className="col-span-full">
                                         <CardContent className="pt-4">
                                             <p className="mb-2 text-sm font-semibold">Catatan</p>
 

@@ -36,10 +36,12 @@ class ToolController extends Controller
                 'used_by',
             ]))
             ->sorting(request()->only(['field', 'direction']))
+            ->withCount(['accessories'])
             ->with([
                 'category',
                 'location' => fn($locationQuery) => $locationQuery->with('parent'),
                 'images',
+                'accessories',
                 'attributeValues.attribute',
                 'usedBy',
                 'stockOpnameDetails' => fn($query) =>
@@ -110,11 +112,13 @@ class ToolController extends Controller
     }
     public function show(Tool $tool)
     {
+        $tool->loadCount(['accessories']);
         $tool->load([
             'category',
             'location.parent',
             'usedBy',
             'images',
+            'accessories',
             'attributeValues.attribute',
             'stockOpnameDetails' => fn($query) => $query->with('stockOpname')->latest(),
             'loans' => fn($query) => $query->with('loanBy')->latest(),
@@ -228,10 +232,7 @@ class ToolController extends Controller
 
                 // Loop Accessories
                 foreach ($request['accessories'] ?? [] as $acc) {
-                    ToolAccesories::create([
-                        'name' => $acc['name'],
-                        'tool_id' => $tool->id,
-                    ]);
+                    $tool->accessories()->update(['name' => $acc['name']]);
                 }
                 $this->syncAttributes($tool, $request->input('attributes', []));
                 $this->syncImages($tool, $request->input('images', []));

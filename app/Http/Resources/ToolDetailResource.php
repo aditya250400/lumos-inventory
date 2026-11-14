@@ -17,7 +17,13 @@ class ToolDetailResource extends JsonResource
             'inventory_type' => $this->inventory_type,
             'status' => $this->status,
             'note' => $this->note,
-
+            'accessories' => $this->whenLoaded('accessories', function () {
+                return $this->accessories->map(fn($accessory) => [
+                    'id' => $accessory->id,
+                    'name' => $accessory->name,
+                ]);
+            }),
+            'accessories_count' => $this->accessories_count,
             'location' => $this->whenLoaded('location', function () {
                 return [
                     'id' => $this->location->id,

@@ -42,6 +42,16 @@ class ToolsResource extends JsonResource
                 ];
             }),
 
+            'accessories' => $this->whenLoaded('accessories', function () {
+                return $this->accessories->map(fn($accessory) => [
+                    'id' => $accessory->id,
+                    'name' => $accessory->name,
+                ]);
+            }),
+            'accessories_count' => $this->accessories_count,
+
+
+
             // foto utama (is_primary) dipakai buat card grid, fallback ke foto pertama kalau
             // gak ada yang ditandai primary, null kalau emang belum ada foto sama sekali
             'primary_image' => $this->whenLoaded('images', function () {
