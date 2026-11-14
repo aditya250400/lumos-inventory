@@ -7,6 +7,7 @@ import { IconPlus, IconStar, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { compressImage } from '@/lib/compressImage';
 import { toast } from 'sonner';
+import { Button } from './ui/button';
 
 export default function ToolFormFields({
     data,
@@ -16,6 +17,9 @@ export default function ToolFormFields({
     locations,
     STATUS_OPTIONS,
     users,
+    updateAccessories,
+    addAccessories,
+    removeAccessories,
     lockCategory,
     INVENTORY_TYPE_OPTIONS,
     lockLocation,
@@ -133,7 +137,7 @@ export default function ToolFormFields({
 
                             <Input
                                 type="number"
-                                min={0}
+                                min={1}
                                 value={data.stock}
                                 onChange={(e) => setData('stock', e.target.value)}
                             />
@@ -263,6 +267,56 @@ export default function ToolFormFields({
                         </div>
                     </div>
                 )}
+
+                {/* tambah accessories */}
+
+                <div className="flex items-center justify-between">
+                    <Label>
+                        Kelengkapan <span className="text-muted-foreground">(opsional)</span>
+                    </Label>
+                </div>
+
+                {data.accessories.length === 0 && (
+                    <p className="text-xs text-muted-foreground">
+                        Belum ada kelengkapan. Klik "Tambah Kelengkapan" untuk menambahkan kelengkapan lainnya
+                    </p>
+                )}
+
+                {data.accessories.map((sub, index) => (
+                    <div key={index} className="space-y-3 rounded-lg border p-3">
+                        {/* Nama + Delete */}
+                        <div className="flex items-start gap-2">
+                            <div className="flex-1 space-y-1">
+                                <Label htmlFor={`accessories-${index}`}>Kelengkapan {index + 1}</Label>
+                                <Input
+                                    id={`accessories-${index}`}
+                                    value={sub.name}
+                                    onChange={(e) => updateAccessories(index, 'name', e.target.value)}
+                                />
+
+                                {errors[`accessories.${index}.name`] && (
+                                    <p className="text-sm text-red-500">{errors[`accessories.${index}.name`]}</p>
+                                )}
+                            </div>
+
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="text-red-500 hover:text-red-600"
+                                onClick={() => removeAccessories(index)}
+                            >
+                                <IconTrash className="size-4" />
+                            </Button>
+                        </div>
+                    </div>
+                ))}
+
+                {/* Tambah Sub kategori */}
+                <Button type="button" variant="outline" size="lg" className="w-full" onClick={addAccessories}>
+                    <IconPlus className="size-4" />
+                    Tambah Kelengkapan
+                </Button>
 
                 {/* Foto Tool */}
                 <div>

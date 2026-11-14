@@ -28,6 +28,13 @@ function emptyData() {
         status: 'Tersedia',
         note: '',
         attributes: [],
+        accessories: [],
+    };
+}
+
+function emptyAccessories() {
+    return {
+        name: '',
     };
 }
 
@@ -48,6 +55,33 @@ export default function CreateToolModal({
         ...emptyData(),
         _method: method,
     });
+
+    // crud tool accessories
+
+    const addAccessories = () => {
+        setData('accessories', [...data.accessories, emptyAccessories()]);
+    };
+
+    const removeAccessories = (index) => {
+        setData(
+            'accessories',
+            data.accessories.filter((_, i) => i !== index),
+        );
+    };
+
+    const updateAccessories = (index, field, value) => {
+        setData(
+            'accessories',
+            data.accessories.map((sub, i) =>
+                i === index
+                    ? {
+                          ...sub,
+                          [field]: value,
+                      }
+                    : sub,
+            ),
+        );
+    };
 
     const [images, setImages] = useState([]);
 
@@ -333,6 +367,9 @@ export default function CreateToolModal({
                                 categories={categories}
                                 locations={locations}
                                 users={users}
+                                updateAccessories={updateAccessories}
+                                addAccessories={addAccessories}
+                                removeAccessories={removeAccessories}
                                 INVENTORY_TYPE_OPTIONS={inventory_types}
                                 STATUS_OPTIONS={statuses}
                                 lockCategory={lockCategory}
@@ -345,7 +382,7 @@ export default function CreateToolModal({
                         </div>
 
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={handleCancelClick}>
+                            <Button type="button" disabled={processing} variant="outline" onClick={handleCancelClick}>
                                 Batal
                             </Button>
 

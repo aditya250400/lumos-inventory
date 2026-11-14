@@ -37,6 +37,18 @@ class ToolRequest extends FormRequest
             ],
             'attributes.*.value' => ['nullable', 'string', 'max:255'],
 
+
+            'accessories' => [
+                'nullable',
+                'array',
+            ],
+
+            'accessories.*.name' => [
+                'required',
+                'string',
+                'min:3',
+                'max:255',
+            ],
             // Foto: campuran foto lama (type=existing, punya id) dan foto baru (type=new, punya file)
             'images' => ['nullable', 'array'],
             'images.*.type' => ['required', Rule::in(['existing', 'new'])],
@@ -55,6 +67,9 @@ class ToolRequest extends FormRequest
             'location_id.required' => 'Lokasi wajib dipilih.',
             'images.*.file.image' => 'File yang diupload harus berupa gambar.',
             'images.*.file.max' => 'Ukuran foto maksimal 5MB.',
+            'accessories.*.name.required' => 'Kelengkapan wajib diisi.',
+            'accessories.*.name.min' => 'Nama Kelengkapan minimal 3 karakter.',
+            'accessories.*.name.max' => 'Nama Kelengkapan maksimal 255 karakter.',
         ];
     }
 }

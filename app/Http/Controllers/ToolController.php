@@ -15,6 +15,7 @@ use App\Enums\StockOpnameEnum;
 use App\Http\Requests\ToolRequest;
 use App\Http\Resources\ToolDetailResource;
 use App\Models\Image;
+use App\Models\ToolAccesories;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -190,6 +191,14 @@ class ToolController extends Controller
                     'note' => $request->note,
                 ]);
 
+                // Loop Accessories
+                foreach ($request['accessories'] ?? [] as $acc) {
+                    ToolAccesories::create([
+                        'name' => $acc['name'],
+                        'tool_id' => $tool->id,
+                    ]);
+                }
+
                 $this->syncAttributes($tool, $request->input('attributes', []));
                 $this->syncImages($tool, $request->input('images', []));
             });
@@ -217,6 +226,13 @@ class ToolController extends Controller
                     'note' => $request->note,
                 ]);
 
+                // Loop Accessories
+                foreach ($request['accessories'] ?? [] as $acc) {
+                    ToolAccesories::create([
+                        'name' => $acc['name'],
+                        'tool_id' => $tool->id,
+                    ]);
+                }
                 $this->syncAttributes($tool, $request->input('attributes', []));
                 $this->syncImages($tool, $request->input('images', []));
             });

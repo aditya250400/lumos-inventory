@@ -245,13 +245,6 @@ export default function Show({ auth, tool, users, categories, locations, invento
                     </div>
 
                     <div className="flex gap-2">
-                        {hasAnyPermissions(auth.permissions, ['tools.update']) && (
-                            <Button onClick={() => onEditTrigger(tool)} variant="blue" size="sm">
-                                <IconPencil className="size-4" />
-                                Edit
-                            </Button>
-                        )}
-
                         <Button asChild variant="blue" size="sm" className="w-full lg:w-auto">
                             <Link href={route('tools.index')}>
                                 <IconArrowLeft className="size-4" />

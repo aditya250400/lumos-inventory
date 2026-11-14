@@ -9,8 +9,6 @@ import {
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Switch } from '@/Components/ui/switch';
 import { flashMessage } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
 import { IconPlus, IconTrash } from '@tabler/icons-react';

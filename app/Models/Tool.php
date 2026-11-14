@@ -47,6 +47,11 @@ class Tool extends Model
         return $this->hasMany(StockOpnameDetail::class);
     }
 
+    public function accessories()
+    {
+        return $this->hasMany(ToolAccesories::class);
+    }
+
     public function scopeFilter(Builder $query, $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
