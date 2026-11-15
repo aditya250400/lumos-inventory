@@ -19,7 +19,7 @@ function emptyData() {
         category_id: '',
         location_id: '',
         name: '',
-        stock: 0,
+        stock: 1,
         inventory_type: 'Internal',
         used_by: '',
         status: 'Tersedia',
@@ -31,6 +31,7 @@ function emptyData() {
 
 function emptyAccessories() {
     return {
+        id: null,
         name: '',
     };
 }
@@ -168,7 +169,10 @@ export default function EditToolModal({
                 tool_attribute_id: attribute.tool_attribute_id,
                 value: attribute.value,
             })),
-            accessories: tool.accessories ?? [],
+            accessories: (tool.accessories ?? []).map((acc) => ({
+                id: acc.id,
+                name: acc.name ?? '',
+            })),
         };
 
         const savedData = savedText ? JSON.parse(savedText) : {};

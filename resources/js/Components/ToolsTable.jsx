@@ -52,10 +52,11 @@ export default function ToolsTable({
                     <TableHead>
                         <SortableHead label="Stok" field="stock" onSortable={onSortable} />
                     </TableHead>
+                    <TableHead>Kelengkapan</TableHead>
 
                     {/* Dynamic attributes */}
                     {dynamicColumns.map((column) => (
-                        <TableHead key={column} className="text-blue-700 bg-blue-50">
+                        <TableHead key={column} className="bg-blue-50 text-blue-700">
                             {column}
                         </TableHead>
                     ))}
@@ -113,6 +114,7 @@ export default function ToolsTable({
                         <TableCell>{tool.used_by?.name ?? '-'}</TableCell>
 
                         <TableCell>{tool.stock}</TableCell>
+                        <TableCell>{tool.accessories_count}</TableCell>
 
                         {/* Dynamic attributes */}
                         {dynamicColumns.map((column) => (
@@ -166,7 +168,7 @@ function SortableHead({ label, field, onSortable }) {
         <Button variant="ghost" onClick={() => onSortable?.(field)}>
             {label}
 
-            <span className="flex-none ml-2 rounded text-muted-foreground">
+            <span className="ml-2 flex-none rounded text-muted-foreground">
                 <IconArrowsDownUp className="size-4" />
             </span>
         </Button>

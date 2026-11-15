@@ -22,7 +22,7 @@ function emptyData() {
         category_id: '',
         location_id: '',
         name: '',
-        stock: 0,
+        stock: 1,
         inventory_type: 'Internal',
         used_by: '',
         status: 'Tersedia',

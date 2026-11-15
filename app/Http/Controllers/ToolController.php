@@ -230,10 +230,56 @@ class ToolController extends Controller
                     'note' => $request->note,
                 ]);
 
-                // Loop Accessories
-                foreach ($request['accessories'] ?? [] as $acc) {
-                    $tool->accessories()->update(['name' => $acc['name']]);
+                //  * ==========================================
+                //  * SYNC ACCESSORIES
+                //  * ==========================================
+                //  */
+
+                $accessories = $request->input('accessories', []);
+
+                $existingIds = [];
+
+                foreach ($accessories as $acc) {
+
+                    // Accessory lama: update berdasarkan ID
+                    if (!empty($acc['id'])) {
+
+                        $accessory = $tool->accessories()
+                            ->where('id', $acc['id'])
+                            ->first();
+
+                        // Pastikan accessory milik tool ini
+                        if (!$accessory) {
+                            throw new \Illuminate\Validation\ValidationException(
+                                validator([], [])
+                                    ->errors()
+                                    ->add(
+                                        'accessories',
+                                        'Kelengkapan tidak valid.'
+                                    )
+                            );
+                        }
+
+                        $accessory->update([
+                            'name' => $acc['name'],
+                        ]);
+
+                        $existingIds[] = $accessory->id;
+                    } else {
+
+                        // Accessory baru: insert
+                        $newAccessory = $tool->accessories()->create([
+                            'name' => $acc['name'],
+                        ]);
+
+                        $existingIds[] = $newAccessory->id;
+                    }
                 }
+
+                // Hapus accessory yang dihapus dari form
+                $tool->accessories()
+                    ->whereNotIn('id', $existingIds)
+                    ->delete();
                 $this->syncAttributes($tool, $request->input('attributes', []));
                 $this->syncImages($tool, $request->input('images', []));
             });
