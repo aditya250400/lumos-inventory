@@ -18,6 +18,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
+
 class ReportController extends Controller
 {
     public function index(Request $request)
@@ -294,5 +295,24 @@ class ReportController extends Controller
                 'discrepancy_reason' => $d->discrepancy_reason,
             ]),
         ];
+    }
+
+    public function printLabel($id)
+    {
+        $tool = Tool::with([
+            'location.parent',
+            'usedBy',
+            'accessories',
+        ])->findOrFail($id);
+
+        $pdf = Pdf::loadView('tools.label', [
+            'tool' => $tool,
+        ]);
+
+        $pdf->setPaper([0, 0, 164.41, 212.60], 'portrait');
+
+        return $pdf->stream(
+            'label-' . $tool->tool_code . '.pdf'
+        );
     }
 }

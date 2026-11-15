@@ -148,6 +148,12 @@ Route::middleware('auth')->group(function () {
     Route::get('reports/tools/export/pdf', [ReportController::class, 'exportToolsPdf'])->name('reports.tools.export.pdf');
     Route::get('reports/stock-opnames/export/excel', [ReportController::class, 'exportStockOpnamesExcel'])->name('reports.stock-opnames.export.excel');
     Route::get('reports/stock-opnames/export/pdf', [ReportController::class, 'exportStockOpnamesPdf'])->name('reports.stock-opnames.export.pdf');
+
+    // print label
+    Route::get('/tools/{id}/print-label', [
+        ReportController::class,
+        'printLabel',
+    ])->name('tools.print-label');
 });
 
 

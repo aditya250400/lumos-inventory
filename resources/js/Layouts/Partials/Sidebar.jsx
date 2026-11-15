@@ -71,7 +71,7 @@ export default function Sidebar({ auth, url }) {
                 />
 
                 {/* Belum ada permission cetak dokumen di PermissionSeeder */}
-                <NavLink url="#" title="Cetak Dokumen" icon={IconPrinter} />
+                {/* <NavLink url="#" title="Cetak Dokumen" icon={IconPrinter} /> */}
 
                 {/* Grup: Data Master */}
                 {hasAnyPermissions(auth.permissions, [

@@ -4,13 +4,20 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { Dialog, DialogContent, DialogTitle } from '@/Components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { formatDateIndo } from '@/lib/utils';
-import { IconChevronLeft, IconChevronRight, IconPhoto } from '@tabler/icons-react';
+import { IconChevronLeft, IconChevronRight, IconPhoto, IconPrinter, IconLoader2 } from '@tabler/icons-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function ToolDetailModal({ open, onOpenChange, tool }) {
     const opnames = useClientPagination(tool?.stock_opname_history ?? [], 10);
 
     const loans = useClientPagination(tool?.loan_history ?? [], 10);
+
+    // print label
+    const handlePrintLabel = () => {
+        if (!tool?.id) return;
+
+        window.open(route('tools.print-label', tool.id), '_blank');
+    };
 
     /*
      * ============================================================
@@ -161,8 +168,19 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                 ================================================== */}
 
                         <div className="mb-4 flex flex-col items-start justify-between gap-y-3 lg:flex-row lg:items-center">
-                            <div>
-                                <h1 className="text-2xl font-bold">{tool?.name}</h1>
+                            <div className="w-full">
+                                <div className="flex items-center justify-between">
+                                    <h1 className="text-2xl font-bold">{tool?.name}</h1>
+                                    <Button
+                                        onClick={handlePrintLabel}
+                                        className="hidden lg:mr-5 lg:inline-flex"
+                                        size="sm"
+                                        variant="blue"
+                                    >
+                                        <IconPrinter />
+                                        Cetak Label
+                                    </Button>
+                                </div>
 
                                 <div className="mt-2 flex flex-wrap gap-2">
                                     <Badge>{tool?.tool_code}</Badge>
@@ -172,6 +190,11 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
                                     <Badge>{tool?.status}</Badge>
                                     <Badge>{`${tool?.accessories_count > 0 ? tool?.accessories_count : 'Tidak ada'} kelengkapan`}</Badge>
                                 </div>
+
+                                <Button onClick={handlePrintLabel} className="mt-3 lg:hidden" size="sm" variant="blue">
+                                    <IconPrinter />
+                                    Cetak Label
+                                </Button>
                             </div>
                         </div>
 
