@@ -36,15 +36,19 @@ export default function StockOpnameModal({
     stockOpname,
     setStockOpname,
     rows,
+    categories,
     setRows,
 }) {
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
     const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
 
+    console.log(stockOpname);
+
     // ---- Step 1 state ----
     // step 2 nya ada di parent (stockOpname/index.jsx)
     const [locationId, setLocationId] = useState('');
+    const [categoryId, setCategoryId] = useState('');
     const [note, setNote] = useState('');
 
     // untuk pagination
@@ -56,6 +60,7 @@ export default function StockOpnameModal({
         setStepOpname(1);
         setLocationId('');
         setNote('');
+        setCategoryId('');
         setStockOpname(null);
         setRows([]);
         setErrors({});
@@ -86,6 +91,7 @@ export default function StockOpnameModal({
             const { data } = await axios.post(route('stock-opnames.store'), {
                 location_id: locationId,
                 note,
+                categoryId,
             });
 
             setStockOpname(data.stock_opname);
@@ -129,6 +135,7 @@ export default function StockOpnameModal({
                     setStepOpname(1);
                     setLocationId('');
                     setNote('');
+                    setCategoryId('');
                     setStockOpname(null);
                     setRows([]);
                     setErrors({});
@@ -169,10 +176,10 @@ export default function StockOpnameModal({
                     <>
                         <DialogHeader>
                             <DialogTitle>Mulai Stock Opname</DialogTitle>
-                            <DialogDescription>Pilih lokasi yang mau dicek dan catatan opsional.</DialogDescription>
+                            <DialogDescription>Sesuaikan lokasi dan kategori nya.</DialogDescription>
                         </DialogHeader>
 
-                        <div className="grid gap-4 py-4 md:grid-cols-2">
+                        <div className="grid gap-4 py-4">
                             <div className="grid gap-2">
                                 <Label>Lokasi</Label>
                                 <Select value={locationId} onValueChange={setLocationId}>
@@ -193,6 +200,29 @@ export default function StockOpnameModal({
                                     </SelectContent>
                                 </Select>
                                 {errors.location_id && <p className="text-sm text-red-500">{errors.location_id[0]}</p>}
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label>Kategori Tool</Label>
+
+                                <Select
+                                    value={categoryId}
+                                    onValueChange={(value) => setCategoryId(value)}
+                                    disabled={!locationId}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Semua Kategori"></SelectValue>
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value="">Semua Kategori</SelectItem>
+                                        {categories.map((category) => (
+                                            <SelectItem key={category.id} value={category.id}>
+                                                {category.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className="grid gap-2">
@@ -232,7 +262,9 @@ export default function StockOpnameModal({
                         <DialogHeader>
                             <DialogTitle>Isi Stok Fisik — {stockOpname.location?.name}</DialogTitle>
                             <DialogDescription>
-                                {rows.length} tool dicek
+                                {rows.length} tool dengan
+                                {` ${stockOpname.category ? 'Kategori ' + stockOpname.category?.name : 'Semua Kategori'}`}{' '}
+                                dicek
                                 {differenceCount > 0 && (
                                     <span className="ml-2 font-semibold text-red-600">
                                         {differenceCount} tool yang memiliki selisih

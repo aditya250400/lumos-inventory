@@ -17,6 +17,16 @@ class StockOpnameDetailIndexResource extends JsonResource
                 'name' => $this->location->name,
             ]),
 
+            'category' => $this->whenLoaded('category', function () {
+                return $this->category ? [
+                    'id' => $this->category->id,
+                    'name' => $this->category->name,
+                ] : [
+                    'id' => null,
+                    'name' => 'Semua Kategori',
+                ];
+            }),
+
             'created_by' => $this->whenLoaded('createdBy', fn() => [
                 'id' => $this->createdBy->id,
                 'name' => $this->createdBy->name,

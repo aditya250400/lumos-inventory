@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('note')->nullable();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->foreignId('location_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained();
             $table->timestamps();
         });
     }

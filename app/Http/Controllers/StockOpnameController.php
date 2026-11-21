@@ -8,6 +8,7 @@ use App\Enums\MessageType;
 use App\Http\Requests\StockOpnameRequest;
 use App\Http\Resources\StockOpnameDetailIndexResource;
 use App\Http\Resources\StockOpnameResource;
+use App\Models\Category;
 use App\Models\Location;
 use App\Models\StockOpname;
 use App\Models\StockOpnameDetail;
@@ -31,9 +32,10 @@ class StockOpnameController extends Controller
                 'created_by',
                 'date_from',
                 'date_to',
+                'category',
             ]))
             ->sorting(request()->only(['field', 'direction']))
-            ->with(['createdBy', 'location', 'details.tool'])
+            ->with(['createdBy', 'location', 'details.tool', 'category'])
             ->latest('created_at')
             ->paginate(request()->input('load', 50));
 
@@ -58,6 +60,10 @@ class StockOpnameController extends Controller
                 ->withCount('tools')
                 ->orderBy('name')
                 ->get(),
+            'categories' => Category::query()
+                ->select(['id', 'name', 'slug'])
+                ->orderBy('name')
+                ->get(),
             'users' => User::query()
                 ->select(['id', 'name', 'email'])
                 ->orderBy('name')
@@ -67,6 +73,7 @@ class StockOpnameController extends Controller
                 'page' => request()->page ?? 1,
                 'load' => 50,
                 'location' => request()->input('location', ''),
+                'category' => request()->input('category', ''),
                 'created_by' => request()->input('created_by', ''),
                 'date_from' => request()->input('date_from', ''),
                 'date_to' => request()->input('date_to', ''),
@@ -78,6 +85,19 @@ class StockOpnameController extends Controller
     {
         $location = Location::findOrFail($request->location_id);
 
+        // Jika categoryId kosong (""), berarti semua kategori
+        $category = null;
+
+        if ($request->filled('categoryId')) {
+            $category = Category::find($request->categoryId);
+
+            if (!$category) {
+                return response()->json([
+                    'message' => 'Kategori tidak ditemukan.',
+                ], 422);
+            }
+        }
+
         $locationIds = collect([$location->id]);
 
         if ($request->boolean('include_children')) {
@@ -86,16 +106,29 @@ class StockOpnameController extends Controller
             );
         }
 
-        $tools = Tool::whereIn('location_id', $locationIds)->get();
+        // Ambil tools berdasarkan lokasi
+        $toolsQuery = Tool::whereIn('location_id', $locationIds);
 
-        $existDraftStatus = StockOpname::where('location_id', $request->location_id)->where('status', StockOpnameEnum::DRAFT->value)->exists();
+        // Filter kategori hanya jika categoryId tidak kosong
+        if ($category) {
+            $toolsQuery->where('category_id', $category->id);
+        }
 
+        $tools = $toolsQuery->get();
+
+        // Validasi jika tidak ada tools
         if ($tools->isEmpty()) {
             return response()->json([
-                'message' => 'Lokasi ini belum punya tools sama sekali, gak ada yang bisa di-opname.',
+                'message' => $category
+                    ? "Lokasi ini belum punya tools dengan kategori {$category->name}"
+                    : 'Lokasi ini belum punya tools sama sekali, gak ada yang bisa di-opname.',
             ], 422);
         }
 
+        // Cek draft stok opname
+        $existDraftStatus = StockOpname::where('location_id', $request->location_id)
+            ->where('status', StockOpnameEnum::DRAFT->value)
+            ->exists();
 
         if ($existDraftStatus) {
             return response()->json([
@@ -103,11 +136,15 @@ class StockOpnameController extends Controller
             ], 422);
         }
 
+        // Buat stok opname
         $stockOpname = DB::transaction(function () use ($request, $tools) {
             $stockOpname = StockOpname::create([
                 'note' => $request->note,
                 'created_by' => Auth::id(),
                 'location_id' => $request->location_id,
+                'category_id' => $request->filled('categoryId')
+                    ? $request->categoryId
+                    : null,
             ]);
 
             foreach ($tools as $tool) {
@@ -115,8 +152,8 @@ class StockOpnameController extends Controller
                     'stock_opname_id' => $stockOpname->id,
                     'tool_id' => $tool->id,
                     'system_stock' => $tool->stock,
-                    'physical_stock' => $tool->stock, // default disamain, user yang koreksi kalau beda
-                    'status' => 'Sesuai', // default, ke-update pas physical_stock diubah di step 2
+                    'physical_stock' => $tool->stock,
+                    'status' => 'Sesuai',
                     'note' => null,
                 ]);
             }
@@ -124,7 +161,7 @@ class StockOpnameController extends Controller
             return $stockOpname;
         });
 
-        $stockOpname->load(['details.tool', 'location', 'createdBy']);
+        $stockOpname->load(['details.tool', 'location', 'createdBy', 'category']);
 
         return response()->json([
             'stock_opname' => new StockOpnameDetailIndexResource($stockOpname),

@@ -112,7 +112,7 @@ export default function Index(props) {
 
                 <Card>
                     <CardHeader className="mb-4 p-0">
-                        <div className="flex w-full flex-col gap-4 px-6 py-4 xl:flex-row xl:items-center">
+                        <div className="grid w-full grid-cols-1 gap-4 px-6 py-4 md:grid-cols-3">
                             {/* LOCATION */}
                             <Select
                                 value={params.location || 'all'}
@@ -123,7 +123,7 @@ export default function Index(props) {
                                     })
                                 }
                             >
-                                <SelectTrigger className="xl:w-fit">
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Pilih lokasi" />
                                 </SelectTrigger>
 
@@ -139,6 +139,31 @@ export default function Index(props) {
                                 </SelectContent>
                             </Select>
 
+                            {/* CATEGORY */}
+                            <Select
+                                value={params.category || 'all'}
+                                onValueChange={(value) =>
+                                    setParams({
+                                        ...params,
+                                        category: value === 'all' ? '' : value,
+                                    })
+                                }
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Pilih Kategori" />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    <SelectItem value="all">Semua Kategori</SelectItem>
+
+                                    {props.categories.map((category) => (
+                                        <SelectItem key={category.id} value={category.slug}>
+                                            {category.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
                             {/* CREATED BY */}
                             <Select
                                 value={params.created_by || 'all'}
@@ -149,7 +174,7 @@ export default function Index(props) {
                                     })
                                 }
                             >
-                                <SelectTrigger className="xl:w-fit">
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Pilih pengguna" />
                                 </SelectTrigger>
 
@@ -164,74 +189,89 @@ export default function Index(props) {
                                 </SelectContent>
                             </Select>
 
-                            {/* DATE */}
-                            <div className="flex items-center gap-2">
-                                <div className="w-full xl:flex xl:w-fit xl:items-center xl:gap-x-1">
-                                    <Label htmlFor="date_from" className="md:hidden">
-                                        Dari
-                                    </Label>
+                            {/* DATE + PAGINATE */}
+                            <div className="grid min-w-0 grid-cols-1 gap-4 md:col-span-3 md:grid-cols-[auto_minmax(0,1fr)]">
+                                {/* DATE */}
+                                <div className="flex min-w-0 flex-col gap-1 md:flex-row md:items-center md:gap-2">
+                                    <div className="min-w-0 flex-1">
+                                        <Label htmlFor="date_from" className="md:hidden">
+                                            Dari
+                                        </Label>
 
-                                    <Input
-                                        id="date_from"
-                                        type="date"
-                                        value={params.date_from || ''}
-                                        onChange={(e) =>
-                                            setParams({
-                                                ...params,
-                                                date_from: e.target.value,
-                                            })
-                                        }
-                                    />
+                                        <Input
+                                            id="date_from"
+                                            type="date"
+                                            className="w-full min-w-0"
+                                            value={params.date_from || ''}
+                                            onChange={(e) =>
+                                                setParams({
+                                                    ...params,
+                                                    date_from: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+
+                                    <span className="hidden shrink-0 text-sm text-muted-foreground md:block">s/d</span>
+
+                                    <div className="min-w-0 flex-1">
+                                        <Label htmlFor="date_to" className="md:hidden">
+                                            Sampai
+                                        </Label>
+
+                                        <Input
+                                            id="date_to"
+                                            type="date"
+                                            className="w-full min-w-0"
+                                            value={params.date_to || ''}
+                                            onChange={(e) =>
+                                                setParams({
+                                                    ...params,
+                                                    date_to: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
                                 </div>
-                                <span className="hidden text-sm text-muted-foreground md:block">s/d</span>
 
-                                <div className="w-full xl:flex xl:w-fit xl:items-center xl:gap-x-1">
-                                    <Label htmlFor="date_to" className="md:hidden">
-                                        Sampai
-                                    </Label>
-
-                                    <Input
-                                        id="date_to"
-                                        type="date"
-                                        value={params.date_to || ''}
-                                        onChange={(e) =>
+                                {/* PAGINATE */}
+                                <div className="min-w-0">
+                                    <Select
+                                        value={String(params?.load)}
+                                        onValueChange={(value) =>
                                             setParams({
                                                 ...params,
-                                                date_to: e.target.value,
+                                                load: value,
                                             })
                                         }
-                                    />
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Load" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            {[10, 23, 50, 75, 100].map((number) => (
+                                                <SelectItem key={number} value={String(number)}>
+                                                    {number}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
 
-                            {/* PAGINATE */}
-                            <Select
-                                value={String(params?.load)}
-                                onValueChange={(value) =>
-                                    setParams({
-                                        ...params,
-                                        load: value,
-                                    })
-                                }
-                            >
-                                <SelectTrigger className="w-full xl:w-24">
-                                    <SelectValue placeholder="Load" />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                    {[10, 23, 50, 75, 100].map((number) => (
-                                        <SelectItem key={number} value={String(number)}>
-                                            {number}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
                             {/* RESET */}
-                            <Button variant="red" onClick={() => setParams(props.state)} size="sm">
-                                <IconRefresh className="size-4" />
-                                Bersihkan
-                            </Button>
+                            <div className="col-span-full">
+                                <Button
+                                    className="w-full"
+                                    variant="red"
+                                    onClick={() => setParams(props.state)}
+                                    size="sm"
+                                >
+                                    <IconRefresh className="size-4" />
+                                    Bersihkan
+                                </Button>
+                            </div>
                         </div>
 
                         <ShowFilter params={params} />
@@ -299,6 +339,18 @@ export default function Index(props) {
                                                 </span>
                                             </Button>
                                         </TableHead>
+                                        <TableHead>
+                                            <Button
+                                                variant="ghost"
+                                                className="group inline-flex"
+                                                onClick={() => onSortable('category_id')}
+                                            >
+                                                Kategori
+                                                <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                    <IconArrowsDownUp className="size-4" />
+                                                </span>
+                                            </Button>
+                                        </TableHead>
 
                                         <TableHead>
                                             <Button
@@ -350,6 +402,7 @@ export default function Index(props) {
                                                         : so.location.name
                                                     : '-'}
                                             </TableCell>
+                                            <TableCell>{so.category ? so.category.name : 'Semua Kategori'}</TableCell>
 
                                             <TableCell>{so.createdBy?.name ?? '-'}</TableCell>
 
@@ -445,6 +498,7 @@ export default function Index(props) {
                 locations={props.locations}
                 discrepancy_reasons={props.discrepancy_reasons}
                 stepOpname={stepOpname}
+                categories={props.categories}
                 setStepOpname={setStepOpname}
                 stockOpname={stockOpname}
                 setStockOpname={setStockOpname}

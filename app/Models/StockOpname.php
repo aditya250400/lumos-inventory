@@ -19,6 +19,11 @@ class StockOpname extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
     public function location()
     {
         return $this->belongsTo(Location::class);
@@ -31,6 +36,11 @@ class StockOpname extends Model
             ->when($filters['location'] ?? null, function ($query, $locationSlug) {
                 $query->whereHas('location', function ($query) use ($locationSlug) {
                     $query->where('slug', $locationSlug);
+                });
+            })
+            ->when($filters['category'] ?? null, function ($query, $categorySlug) {
+                $query->whereHas('category', function ($query) use ($categorySlug) {
+                    $query->where('slug', $categorySlug);
                 });
             })
 

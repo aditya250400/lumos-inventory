@@ -76,19 +76,19 @@ export default function StockOpnameDetailModal({ open, onOpenChange, stockOpname
 
                 {/* SUMMARY */}
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    <div className="p-3 border rounded-lg">
+                    <div className="rounded-lg border p-3">
                         <p className="text-xs text-muted-foreground">Dibuat Oleh</p>
 
                         <p className="mt-1 font-semibold">{stockOpname.createdBy.name}</p>
                     </div>
 
-                    <div className="p-3 border rounded-lg">
-                        <p className="text-xs text-muted-foreground">Lokasi</p>
+                    <div className="rounded-lg border p-3">
+                        <p className="text-xs text-muted-foreground">Kategori yang Dicek</p>
 
-                        <p className="mt-1 font-semibold">{locationName}</p>
+                        <p className="mt-1 font-semibold">{stockOpname.category?.name ?? 'Semua Kategori'}</p>
                     </div>
 
-                    <div className="p-3 border rounded-lg">
+                    <div className="rounded-lg border p-3">
                         <p className="text-xs text-muted-foreground">Status</p>
 
                         <div className="mt-1">
@@ -96,7 +96,7 @@ export default function StockOpnameDetailModal({ open, onOpenChange, stockOpname
                         </div>
                     </div>
 
-                    <div className="p-3 border rounded-lg">
+                    <div className="rounded-lg border p-3">
                         <p className="text-xs text-muted-foreground">Selisih</p>
 
                         <p className={`mt-1 font-semibold ${differenceCount > 0 ? 'text-red-500' : 'text-green-600'}`}>
@@ -107,10 +107,10 @@ export default function StockOpnameDetailModal({ open, onOpenChange, stockOpname
 
                 {/* NOTE */}
                 {stockOpname.note && (
-                    <div className="p-3 border rounded-lg bg-muted/30">
+                    <div className="rounded-lg border bg-muted/30 p-3">
                         <p className="text-xs font-medium text-muted-foreground">Catatan Stock Opname</p>
 
-                        <p className="mt-1 text-sm whitespace-pre-wrap">{stockOpname.note}</p>
+                        <p className="mt-1 whitespace-pre-wrap text-sm">{stockOpname.note}</p>
                     </div>
                 )}
 

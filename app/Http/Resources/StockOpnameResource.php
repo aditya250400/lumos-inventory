@@ -38,6 +38,15 @@ class StockOpnameResource extends JsonResource
                     'name' => $this->createdBy->name,
                 ];
             }),
+            'category' => $this->whenLoaded('category', function () {
+                return $this->category ? [
+                    'id' => $this->category->id,
+                    'name' => $this->category->name,
+                ] : [
+                    'id' => null,
+                    'name' => 'Semua Kategori',
+                ];
+            }),
             'location' => $this->whenLoaded('location', function () {
                 return [
                     'id' => $this->location->id,
