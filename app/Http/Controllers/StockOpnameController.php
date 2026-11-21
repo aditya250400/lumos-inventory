@@ -51,10 +51,11 @@ class StockOpnameController extends Controller
             ]),
             'locations' => Location::query()
                 ->select(['id', 'name', 'slug', 'parent_id'])
-                ->withCount(['tools'])
+                ->has('tools')
                 ->with([
                     'parent:id,name,slug',
                 ])
+                ->withCount('tools')
                 ->orderBy('name')
                 ->get(),
             'users' => User::query()

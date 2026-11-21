@@ -297,22 +297,16 @@ class ReportController extends Controller
         ];
     }
 
-    public function printLabel($id)
+    public function printLabel(Tool $tool)
     {
-        $tool = Tool::with([
+        $tool->load([
             'location.parent',
             'usedBy',
             'accessories',
-        ])->findOrFail($id);
-
-        $pdf = Pdf::loadView('tools.label', [
-            'tool' => $tool,
         ]);
 
-        $pdf->setPaper([0, 0, 164.41, 212.60], 'portrait');
-
-        return $pdf->stream(
-            'label-' . $tool->tool_code . '.pdf'
-        );
+        return Inertia('Tool/PrintLabel', [
+            'tool' => $tool,
+        ]);
     }
 }

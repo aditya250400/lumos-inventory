@@ -25,7 +25,7 @@ class ToolRequest extends FormRequest
             'inventory_type' => ['required', Rule::enum(InventoryTypeEnum::class)],
             'status' => ['required', Rule::enum(ToolEnum::class)],
             'used_by' => ['nullable', 'integer', 'exists:users,id'],
-            'note' => ['nullable', 'string', 'max:1000'],
+            'note' => ['nullable', 'string'],
 
             // Attribut dinamis sesuai kategori yang dipilih
             'attributes' => ['nullable', 'array'],

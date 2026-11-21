@@ -14,9 +14,9 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
 
     // print label
     const handlePrintLabel = () => {
-        if (!tool?.id) return;
+        if (!tool) return;
 
-        window.open(route('tools.print-label', tool.id), '_blank');
+        window.open(route('tools.print-label', tool), '_blank');
     };
 
     /*
