@@ -61,7 +61,7 @@ export default function PrintLabel({ tool }) {
                 ========================================= */}
 
                     <div className={`print-label ${accessories.length === 0 ? 'last' : ''}`}>
-                        <LabelHeader code={tool.tool_code} page={total > 1 ? `1/${total}` : ''} />
+                        <LabelHeader code={tool.tool_code} page={`1/${total}`} />
 
                         <div className="label-name">{tool.name}</div>
 
@@ -91,11 +91,10 @@ export default function PrintLabel({ tool }) {
                             </tbody>
                         </table>
 
+                        <div className="label-accessory-title">Kelengkapan Semua ({total})</div>
+                        <div>- {tool.name}</div>
                         {accessories.length > 0 && (
                             <>
-                                <div className="label-accessory-title">Kelengkapan Semua ({total})</div>
-                                <div>- {tool.name}</div>
-
                                 <div className="label-accessory-list">
                                     {accessories.map((item, index) => (
                                         <div key={item.id ?? index}>- {item.name}</div>

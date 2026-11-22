@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Models\Tool;
 
 class DashboardController extends Controller
 {
@@ -195,6 +196,75 @@ class DashboardController extends Controller
             ->orderByDesc('total_tools')
             ->limit(5)
             ->get();
+
+        /*
+|--------------------------------------------------------------------------
+| Lokasi milik saya
+|--------------------------------------------------------------------------
+*/
+
+        $myLocations = DB::table('locations')
+            ->leftJoin('locations as parents', 'locations.parent_id', '=', 'parents.id')
+            ->leftJoin('tools', 'locations.id', '=', 'tools.location_id')
+            ->where('locations.user_id', $user->id)
+            ->select(
+                'locations.id',
+                'locations.name',
+                'locations.slug',
+                'parents.name as parent_name',
+                'parents.slug as parent_slug'
+            )
+            ->selectRaw('COUNT(tools.id) as total_tools')
+            ->selectRaw('COALESCE(SUM(tools.stock), 0) as total_stock')
+            ->selectRaw(
+                "COALESCE(SUM(CASE WHEN tools.status IN ('Rusak', 'Hilang', 'Tidak Tersedia') THEN 1 ELSE 0 END), 0) as problem_tools"
+            )
+            ->groupBy(
+                'locations.id',
+                'locations.name',
+                'locations.slug',
+                'parents.name',
+                'parents.slug'
+            )
+            ->orderBy('locations.name')
+            ->get()
+            ->map(fn($item) => [
+                'id' => $item->id,
+                'name' => $item->name,
+                'slug' => $item->slug,
+                'parent_name' => $item->parent_name,
+                'parent_slug' => $item->parent_slug,
+                'total_tools' => (int) $item->total_tools,
+                'total_stock' => (int) $item->total_stock,
+                'problem_tools' => (int) $item->problem_tools,
+            ]);
+
+        /*
+|--------------------------------------------------------------------------
+| Tools yang saya pegang (relasi usedBy)
+|--------------------------------------------------------------------------
+*/
+
+        $myToolsQuery = Tool::whereBelongsTo($user, 'usedBy');
+
+        $myToolsTotal = (clone $myToolsQuery)->count();
+        $myToolsStock = (int) (clone $myToolsQuery)->sum('stock');
+
+        $myTools = (clone $myToolsQuery)
+            ->with(['category:id,name', 'location:id,name'])
+            ->latest('updated_at')
+            ->limit(5)
+            ->get()
+            ->map(fn($tool) => [
+                'id' => $tool->id,
+                'tool_code' => $tool->tool_code,
+                'name' => $tool->name,
+                'stock' => $tool->stock,
+                'status' => $tool->status,
+                'category_name' => $tool->category?->name,
+                'location_name' => $tool->location?->name,
+                'updated_at' => $tool->updated_at,
+            ]);
 
         /*
         |--------------------------------------------------------------------------
@@ -410,6 +480,12 @@ class DashboardController extends Controller
             'latestProblemTools' => $latestProblemTools,
             'latestTools' => $latestTools,
             'topHolders' => $topHolders,
+            'mine' => [
+                'locations' => $myLocations,
+                'toolsTotal' => $myToolsTotal,
+                'toolsStock' => $myToolsStock,
+                'tools' => $myTools,
+            ],
 
             'canViewOpname' => $canViewOpname,
             'opname' => $opname,

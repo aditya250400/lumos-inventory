@@ -1,90 +1,30 @@
-import AlertAction from '@/Components/AlertAction';
 import EditToolModal from '@/Components/EditToolModal';
+import ClientPagination, { useClientPagination } from '@/Components/ClientPagination';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Dialog, DialogContent, DialogTitle } from '@/Components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import AppLayout from '@/Layouts/AppLayout';
-import hasAnyPermissions, { deleteAction, formatDateIndo } from '@/lib/utils';
+import { formatDateIndo } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import {
-    IconArrowLeft,
-    IconChevronLeft,
-    IconChevronRight,
-    IconPencil,
-    IconPhoto,
-    IconTrash,
-} from '@tabler/icons-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { IconArrowLeft, IconChevronLeft, IconChevronRight, IconPhoto, IconPrinter } from '@tabler/icons-react';
+import { useEffect, useRef, useState } from 'react';
 
-const PER_PAGE = 5;
-
-function usePagedList(items) {
-    const [page, setPage] = useState(1);
-
-    const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));
-
-    const paged = useMemo(() => items.slice((page - 1) * PER_PAGE, page * PER_PAGE), [items, page]);
-
-    return {
-        page,
-        setPage,
-        totalPages,
-        paged,
-    };
-}
-
-function TablePagination({ page, setPage, totalPages, total, label }) {
-    if (total === 0) return null;
-
-    return (
-        <div className="flex flex-col items-center justify-between gap-y-2 border-t px-4 py-3 lg:flex-row">
-            <p className="text-sm text-muted-foreground">
-                Menampilkan {total === 0 ? 0 : (page - 1) * PER_PAGE + 1}-{Math.min(page * PER_PAGE, total)} dari{' '}
-                {total} {label}
-            </p>
-
-            {totalPages > 1 && (
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
-                        <IconChevronLeft className="size-4" />
-                    </Button>
-
-                    <span className="rounded-md bg-blue-600 px-3 py-1 text-sm text-white">{page}</span>
-
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        disabled={page === totalPages}
-                        onClick={() => setPage((p) => p + 1)}
-                    >
-                        <IconChevronRight className="size-4" />
-                    </Button>
-                </div>
-            )}
-        </div>
-    );
-}
-
-export default function Show({ auth, tool, users, categories, locations, inventory_types, statuses }) {
-    const opname = usePagedList(tool.stock_opname_history ?? []);
-
-    const loans = usePagedList(tool.loan_history ?? []);
+export default function Show({ tool, users, categories, locations, inventory_types, statuses }) {
+    const opnames = useClientPagination(tool?.stock_opname_history ?? [], 10);
+    const loans = useClientPagination(tool?.loan_history ?? [], 10);
 
     /*
      * ============================================================
-     * IMAGES
+     * PRINT LABEL
      * ============================================================
      */
 
-    const images = tool.images ?? [];
+    const handlePrintLabel = () => {
+        if (!tool) return;
 
-    const primaryImageIndex = Math.max(
-        0,
-        images.findIndex((image) => image.is_primary),
-    );
-
-    const primaryImage = images[primaryImageIndex] ?? images[0] ?? null;
+        window.open(route('tools.print-label', tool), '_blank');
+    };
 
     /*
      * ============================================================
@@ -95,10 +35,20 @@ export default function Show({ auth, tool, users, categories, locations, invento
     const [editOpen, setEditOpen] = useState(false);
     const [selectedTool, setSelectedTool] = useState(null);
 
-    const onEditTrigger = (tool) => {
-        setSelectedTool(tool);
-        setEditOpen(true);
-    };
+    /*
+     * ============================================================
+     * IMAGES
+     * ============================================================
+     */
+
+    const images = tool?.images ?? [];
+
+    const primaryImageIndex = Math.max(
+        0,
+        images.findIndex((image) => image.is_primary),
+    );
+
+    const primaryImage = images[primaryImageIndex] ?? images[0] ?? null;
 
     /*
      * ============================================================
@@ -112,70 +62,34 @@ export default function Show({ auth, tool, users, categories, locations, invento
 
     const imageViewerOpen = selectedImageIndex !== null;
 
-    /*
-     * ============================================================
-     * OPEN IMAGE
-     * ============================================================
-     */
-
     const openImageViewer = (index) => {
         if (images.length === 0) return;
 
         setSelectedImageIndex(index);
     };
 
-    /*
-     * ============================================================
-     * CLOSE IMAGE
-     * ============================================================
-     */
-
     const closeImageViewer = () => {
         setSelectedImageIndex(null);
     };
 
-    /*
-     * ============================================================
-     * PREVIOUS IMAGE
-     * ============================================================
-     */
-
     const showPreviousImage = () => {
         setSelectedImageIndex((current) => {
-            if (current === null || images.length === 0) {
-                return current;
-            }
+            if (current === null || images.length === 0) return current;
 
             return current === 0 ? images.length - 1 : current - 1;
         });
     };
 
-    /*
-     * ============================================================
-     * NEXT IMAGE
-     * ============================================================
-     */
-
     const showNextImage = () => {
         setSelectedImageIndex((current) => {
-            if (current === null || images.length === 0) {
-                return current;
-            }
+            if (current === null || images.length === 0) return current;
 
             return current === images.length - 1 ? 0 : current + 1;
         });
     };
 
-    /*
-     * ============================================================
-     * SCROLL THUMBNAILS
-     * ============================================================
-     */
-
     const scrollThumbnails = (direction) => {
-        if (!thumbnailContainerRef.current) {
-            return;
-        }
+        if (!thumbnailContainerRef.current) return;
 
         thumbnailContainerRef.current.scrollBy({
             left: direction === 'left' ? -220 : 220,
@@ -190,9 +104,7 @@ export default function Show({ auth, tool, users, categories, locations, invento
      */
 
     useEffect(() => {
-        if (!imageViewerOpen) {
-            return;
-        }
+        if (!imageViewerOpen) return;
 
         const handleKeyDown = (event) => {
             if (event.key === 'ArrowLeft') {
@@ -232,25 +144,48 @@ export default function Show({ auth, tool, users, categories, locations, invento
                 ================================================== */}
 
                 <div className="mb-4 flex flex-col items-start justify-between gap-y-3 lg:flex-row lg:items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold">{tool.name}</h1>
+                    <div className="w-full">
+                        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                            <h1 className="text-2xl font-bold">{tool?.name}</h1>
+
+                            <div className="mt-3 hidden gap-2 lg:flex lg:flex-wrap">
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={route('tools.index')}>
+                                        <IconArrowLeft className="size-4" />
+                                        Kembali
+                                    </Link>
+                                </Button>
+                                <Button onClick={handlePrintLabel} size="sm" variant="blue">
+                                    <IconPrinter className="size-4" />
+                                    Cetak Label
+                                </Button>
+                            </div>
+                        </div>
 
                         <div className="mt-2 flex flex-wrap gap-2">
-                            <Badge>{tool.tool_code}</Badge>
+                            <Badge>{tool?.tool_code}</Badge>
 
-                            <Badge>{tool.inventory_type === 'internal' ? 'Internal' : 'Eksternal'}</Badge>
+                            <Badge>{tool?.inventory_type === 'internal' ? 'Internal' : 'Eksternal'}</Badge>
 
-                            <Badge>{tool.status}</Badge>
+                            <Badge>{tool?.status}</Badge>
+
+                            <Badge>
+                                {tool?.accessories_count > 0 ? tool.accessories_count : 'Tidak ada'} kelengkapan
+                            </Badge>
                         </div>
-                    </div>
 
-                    <div className="flex gap-2">
-                        <Button asChild variant="blue" size="sm" className="w-full lg:w-auto">
-                            <Link href={route('tools.index')}>
-                                <IconArrowLeft className="size-4" />
-                                Kembali
-                            </Link>
-                        </Button>
+                        <div className="mt-3 flex w-full items-center gap-x-2 lg:hidden">
+                            <Button asChild variant="outline" size="sm" className="w-full">
+                                <Link href={route('tools.index')}>
+                                    <IconArrowLeft className="size-4" />
+                                    Kembali
+                                </Link>
+                            </Button>
+                            <Button onClick={handlePrintLabel} size="sm" variant="blue" className="w-full">
+                                <IconPrinter className="size-4" />
+                                Cetak Label
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -259,18 +194,12 @@ export default function Show({ auth, tool, users, categories, locations, invento
                 ================================================== */}
 
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    {/* =================================================
-                        FOTO
-                    ================================================== */}
+                    {/* FOTO */}
 
                     <Card>
                         <CardContent className="pt-6">
                             {primaryImage ? (
                                 <>
-                                    {/* ===============================
-                                        PRIMARY IMAGE
-                                    ================================ */}
-
                                     <button
                                         type="button"
                                         onClick={() => openImageViewer(primaryImageIndex)}
@@ -279,18 +208,13 @@ export default function Show({ auth, tool, users, categories, locations, invento
                                     >
                                         <img
                                             src={primaryImage.url}
-                                            alt={tool.name}
+                                            alt={tool?.name}
                                             className="h-full w-full object-cover transition duration-200 group-hover:scale-[1.02] group-hover:opacity-90"
                                         />
                                     </button>
 
-                                    {/* ===============================
-                                        THUMBNAILS
-                                    ================================ */}
-
                                     {images.length > 1 && (
                                         <div className="flex items-center gap-2">
-                                            {/* PANAH KIRI */}
                                             <Button
                                                 type="button"
                                                 variant="outline"
@@ -302,7 +226,6 @@ export default function Show({ auth, tool, users, categories, locations, invento
                                                 <IconChevronLeft className="size-4" />
                                             </Button>
 
-                                            {/* THUMBNAIL LIST */}
                                             <div
                                                 ref={thumbnailContainerRef}
                                                 className="flex min-w-0 flex-1 gap-2 overflow-x-auto scroll-smooth py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -321,11 +244,10 @@ export default function Show({ auth, tool, users, categories, locations, invento
                                                     >
                                                         <img
                                                             src={img.url}
-                                                            alt={`${tool.name} ${index + 1}`}
+                                                            alt={`${tool?.name} ${index + 1}`}
                                                             className="h-full w-full object-cover"
                                                         />
 
-                                                        {/* PRIMARY BADGE */}
                                                         {img.is_primary && (
                                                             <span className="absolute bottom-0 left-0 right-0 bg-blue-500/90 px-1 py-0.5 text-[9px] font-medium text-white">
                                                                 Utama
@@ -335,7 +257,6 @@ export default function Show({ auth, tool, users, categories, locations, invento
                                                 ))}
                                             </div>
 
-                                            {/* PANAH KANAN */}
                                             <Button
                                                 type="button"
                                                 variant="outline"
@@ -357,16 +278,14 @@ export default function Show({ auth, tool, users, categories, locations, invento
                         </CardContent>
                     </Card>
 
-                    {/* =================================================
-                        INFO KANAN
-                    ================================================== */}
+                    {/* INFO KANAN */}
 
                     <div className="flex flex-col gap-4">
                         <div className="grid grid-cols-2 gap-3">
                             <InfoBox
                                 label="Lokasi"
                                 value={
-                                    tool.location
+                                    tool?.location
                                         ? tool.location.parent?.name
                                             ? `${tool.location.name} (${tool.location.parent.name})`
                                             : tool.location.name
@@ -374,25 +293,26 @@ export default function Show({ auth, tool, users, categories, locations, invento
                                 }
                             />
 
-                            <InfoBox label="Stok" value={`${tool.stock} Unit`} />
+                            <InfoBox label="Stok" value={`${tool?.stock ?? 0} Unit`} />
 
-                            <InfoBox label="Digunakan Oleh" value={tool.used_by?.name ?? 'Semua Staff'} />
+                            <InfoBox label="Digunakan Oleh" value={tool?.used_by?.name ?? 'Semua Staff'} />
 
-                            <InfoBox label="Kategori" value={tool.category?.name ?? '-'} />
+                            <InfoBox label="Kategori" value={tool?.category?.name ?? '-'} />
                         </div>
 
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {/* ATRIBUT */}
+
                             <Card>
                                 <CardContent className="pt-4">
                                     <p className="mb-2 text-sm font-semibold">
                                         Atribut Kategori &quot;
-                                        {tool.category?.name}
+                                        {tool?.category?.name}
                                         &quot;
                                     </p>
 
                                     <div className="scroll-bar max-h-40 space-y-2 overflow-y-auto pr-1">
-                                        {(tool.attributes_show ?? []).length === 0 ? (
+                                        {(tool?.attributes_show ?? []).length === 0 ? (
                                             <p className="text-sm text-muted-foreground">Tidak ada atribut</p>
                                         ) : (
                                             tool.attributes_show.map((attr) => (
@@ -407,13 +327,45 @@ export default function Show({ auth, tool, users, categories, locations, invento
                                 </CardContent>
                             </Card>
 
-                            {/* CATATAN */}
+                            {/* KELENGKAPAN */}
+
                             <Card>
+                                <CardContent className="pt-4">
+                                    <div className="mb-2 flex items-center justify-between">
+                                        <p className="text-sm font-semibold">Kelengkapan</p>
+
+                                        <span className="text-xs text-muted-foreground">
+                                            {(tool?.accessories ?? []).length} Item
+                                        </span>
+                                    </div>
+
+                                    <div className="scroll-bar max-h-40 space-y-2 overflow-y-auto pr-1">
+                                        {(tool?.accessories ?? []).length === 0 ? (
+                                            <p className="text-sm text-muted-foreground">Tidak ada kelengkapan</p>
+                                        ) : (
+                                            tool.accessories.map((acc, i) => (
+                                                <div
+                                                    key={acc.id ?? `${acc.name}-${i}`}
+                                                    className="flex items-center gap-1 text-sm"
+                                                >
+                                                    <span className="text-muted-foreground">{i + 1}.</span>
+
+                                                    <span className="font-medium">{acc.name}</span>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* CATATAN */}
+
+                            <Card className="col-span-full">
                                 <CardContent className="pt-4">
                                     <p className="mb-2 text-sm font-semibold">Catatan</p>
 
                                     <div className="max-h-40 overflow-y-auto pr-1">
-                                        <p className="whitespace-pre-wrap break-words text-sm">{tool.note || '-'}</p>
+                                        <p className="whitespace-pre-wrap break-words text-sm">{tool?.note || '-'}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -429,51 +381,41 @@ export default function Show({ auth, tool, users, categories, locations, invento
                     <CardContent className="p-0">
                         <p className="p-4 text-sm font-semibold">Riwayat Stock Opname</p>
 
-                        <Table>
+                        <Table className="overflow-x-auto">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="px-4">#</TableHead>
-
                                     <TableHead>Tanggal</TableHead>
-
                                     <TableHead>Stok Sistem</TableHead>
-
                                     <TableHead>Stok Fisik</TableHead>
-
                                     <TableHead>Selisih</TableHead>
-
                                     <TableHead>Status</TableHead>
                                     <TableHead>Alasan Perbedaan Stok</TableHead>
-
                                     <TableHead>Catatan</TableHead>
                                 </TableRow>
                             </TableHeader>
 
                             <TableBody>
-                                {opname.paged.length === 0 ? (
+                                {opnames.pagedItems.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="py-6 text-center text-muted-foreground">
+                                        <TableCell colSpan={8} className="py-6 text-center text-muted-foreground">
                                             Belum ada riwayat stock opname
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    opname.paged.map((row, index) => (
+                                    opnames.pagedItems.map((row, index) => (
                                         <TableRow key={row.id}>
                                             <TableCell className="px-4">
-                                                {(opname.page - 1) * PER_PAGE + index + 1}
+                                                {(opnames.page - 1) * opnames.perPage + index + 1}
                                             </TableCell>
 
                                             <TableCell>{formatDateIndo(row.date)}</TableCell>
 
                                             <TableCell>{row.system_stock}</TableCell>
-
                                             <TableCell>{row.physical_stock}</TableCell>
-
                                             <TableCell>{row.difference}</TableCell>
-
                                             <TableCell>{row.status}</TableCell>
-                                            <TableCell>{row.discrepancy_reason}</TableCell>
-
+                                            <TableCell>{row.discrepancy_reason || '-'}</TableCell>
                                             <TableCell>{row.note || '-'}</TableCell>
                                         </TableRow>
                                     ))
@@ -481,11 +423,13 @@ export default function Show({ auth, tool, users, categories, locations, invento
                             </TableBody>
                         </Table>
 
-                        <TablePagination
-                            page={opname.page}
-                            setPage={opname.setPage}
-                            totalPages={opname.totalPages}
-                            total={(tool.stock_opname_history ?? []).length}
+                        <ClientPagination
+                            page={opnames.page}
+                            setPage={opnames.setPage}
+                            totalPages={opnames.totalPages}
+                            total={opnames.total}
+                            from={opnames.from}
+                            to={opnames.to}
                             label="Riwayat Stock Opname"
                         />
                     </CardContent>
@@ -503,35 +447,29 @@ export default function Show({ auth, tool, users, categories, locations, invento
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="px-4">#</TableHead>
-
                                     <TableHead>Kode Pinjam</TableHead>
-
                                     <TableHead>Dipinjam Oleh</TableHead>
-
                                     <TableHead>Tanggal Pinjam</TableHead>
-
                                     <TableHead>Tanggal Kembali</TableHead>
-
                                     <TableHead>Status</TableHead>
                                 </TableRow>
                             </TableHeader>
 
                             <TableBody>
-                                {loans.paged.length === 0 ? (
+                                {loans.pagedItems.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={6} className="py-6 text-center text-muted-foreground">
                                             Belum ada riwayat peminjaman
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    loans.paged.map((row, index) => (
+                                    loans.pagedItems.map((row, index) => (
                                         <TableRow key={row.id}>
                                             <TableCell className="px-4">
-                                                {(loans.page - 1) * PER_PAGE + index + 1}
+                                                {(loans.page - 1) * loans.perPage + index + 1}
                                             </TableCell>
 
                                             <TableCell>{row.loan_code}</TableCell>
-
                                             <TableCell>{row.loan_by ?? '-'}</TableCell>
 
                                             <TableCell>{formatDateIndo(row.loan_date)}</TableCell>
@@ -547,11 +485,13 @@ export default function Show({ auth, tool, users, categories, locations, invento
                             </TableBody>
                         </Table>
 
-                        <TablePagination
+                        <ClientPagination
                             page={loans.page}
                             setPage={loans.setPage}
                             totalPages={loans.totalPages}
-                            total={(tool.loan_history ?? []).length}
+                            total={loans.total}
+                            from={loans.from}
+                            to={loans.to}
                             label="Riwayat Peminjaman"
                         />
                     </CardContent>
@@ -565,72 +505,48 @@ export default function Show({ auth, tool, users, categories, locations, invento
             <Dialog
                 open={imageViewerOpen}
                 onOpenChange={(open) => {
-                    if (!open) {
-                        closeImageViewer();
-                    }
+                    if (!open) closeImageViewer();
                 }}
             >
                 <DialogContent
                     showCloseButton={false}
                     className="max-h-[95vh] max-w-[95vw] border-0 bg-transparent p-0 shadow-none outline-none"
                 >
-                    <DialogTitle className="sr-only">Preview Foto {tool.name}</DialogTitle>
+                    <DialogTitle className="sr-only">Preview Foto {tool?.name}</DialogTitle>
 
                     {selectedImageIndex !== null && images[selectedImageIndex] && (
                         <div className="relative flex h-[90vh] w-full items-center justify-center">
-                            {/* =================================
-                                    FOTO UTAMA MODAL
-                                ================================== */}
-
                             <img
                                 src={images[selectedImageIndex].url}
-                                alt={`${tool.name} ${selectedImageIndex + 1}`}
+                                alt={`${tool?.name} ${selectedImageIndex + 1}`}
                                 className="max-h-[85vh] max-w-[85vw] rounded-lg object-contain"
                             />
 
-                            {/* =================================
-                                    PANAH KIRI
-                                ================================== */}
-
                             {images.length > 1 && (
-                                <button
-                                    type="button"
-                                    onClick={showPreviousImage}
-                                    className="absolute left-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white shadow-lg transition hover:bg-black/80 sm:left-4"
-                                    aria-label="Foto sebelumnya"
-                                >
-                                    <IconChevronLeft className="size-6" />
-                                </button>
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={showPreviousImage}
+                                        className="absolute left-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white shadow-lg transition hover:bg-black/80 sm:left-4"
+                                        aria-label="Foto sebelumnya"
+                                    >
+                                        <IconChevronLeft className="size-6" />
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={showNextImage}
+                                        className="absolute right-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white shadow-lg transition hover:bg-black/80 sm:right-4"
+                                        aria-label="Foto berikutnya"
+                                    >
+                                        <IconChevronRight className="size-6" />
+                                    </button>
+
+                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
+                                        {selectedImageIndex + 1} / {images.length}
+                                    </div>
+                                </>
                             )}
-
-                            {/* =================================
-                                    PANAH KANAN
-                                ================================== */}
-
-                            {images.length > 1 && (
-                                <button
-                                    type="button"
-                                    onClick={showNextImage}
-                                    className="absolute right-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white shadow-lg transition hover:bg-black/80 sm:right-4"
-                                    aria-label="Foto berikutnya"
-                                >
-                                    <IconChevronRight className="size-6" />
-                                </button>
-                            )}
-
-                            {/* =================================
-                                    COUNTER
-                                ================================== */}
-
-                            {images.length > 1 && (
-                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
-                                    {selectedImageIndex + 1} / {images.length}
-                                </div>
-                            )}
-
-                            {/* =================================
-                                    CLOSE
-                                ================================== */}
 
                             <button
                                 type="button"

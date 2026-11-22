@@ -208,6 +208,43 @@ function ToolList({ tools, dateKey, empty }) {
     );
 }
 
+function MyLocationCard({ location }) {
+    const href = location.parent_slug
+        ? route('location.sub-locations.show', [location.parent_slug, location.slug])
+        : route('location.show', location.slug);
+
+    return (
+        <Link
+            href={href}
+            className="block rounded-lg border border-slate-200 bg-blue-50/40 p-4 transition-colors hover:border-blue-300"
+        >
+            <p className="text-sm font-semibold text-slate-900">{location.name}</p>
+            {location.parent_name && <p className="text-xs text-slate-500">{location.parent_name}</p>}
+
+            <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
+                <div>
+                    <dd className="text-lg font-semibold tabular-nums text-slate-900">{fmt(location.total_tools)}</dd>
+                    <dt className="text-xs text-slate-500">Alat</dt>
+                </div>
+                <div>
+                    <dd className="text-lg font-semibold tabular-nums text-slate-900">{fmt(location.total_stock)}</dd>
+                    <dt className="text-xs text-slate-500">Unit</dt>
+                </div>
+                <div>
+                    <dd
+                        className={`text-lg font-semibold tabular-nums ${
+                            location.problem_tools > 0 ? 'text-red-600' : 'text-slate-900'
+                        }`}
+                    >
+                        {fmt(location.problem_tools)}
+                    </dd>
+                    <dt className="text-xs text-slate-500">Bermasalah</dt>
+                </div>
+            </dl>
+        </Link>
+    );
+}
+
 /* ------------------------------------------------------------------ */
 /* Page                                                               */
 /* ------------------------------------------------------------------ */
@@ -220,6 +257,7 @@ export default function Dashboard({
     topHolders,
     canViewOpname,
     opname,
+    mine,
 }) {
     const lastOpname = opname?.lastOpname;
 
@@ -264,6 +302,49 @@ export default function Dashboard({
                                 tone="amber"
                             />
                         )}
+                    </div>
+
+                    {/* Milik saya */}
+                    <div className="grid gap-4 lg:grid-cols-2">
+                        <Panel
+                            icon={IconMapPin}
+                            title="Lokasi saya"
+                            description="Lokasi yang menjadi tanggung jawab Anda"
+                        >
+                            {mine.locations?.length ? (
+                                <div className="space-y-3">
+                                    {mine.locations.map((location) => (
+                                        <MyLocationCard key={location.id} location={location} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <Empty>Anda belum mempunyai lokasi sendiri.</Empty>
+                            )}
+                        </Panel>
+
+                        <Panel icon={IconTool} title="Tools saya" description="Alat yang tercatat Anda pegang">
+                            {mine.toolsTotal > 0 ? (
+                                <>
+                                    <div className="mb-2 flex gap-6">
+                                        <div>
+                                            <p className="text-xl font-semibold tabular-nums text-slate-900">
+                                                {fmt(mine.toolsTotal)}
+                                            </p>
+                                            <p className="text-xs text-slate-500">Alat</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xl font-semibold tabular-nums text-slate-900">
+                                                {fmt(mine.toolsStock)}
+                                            </p>
+                                            <p className="text-xs text-slate-500">Unit</p>
+                                        </div>
+                                    </div>
+                                    <ToolList tools={mine.tools} dateKey="updated_at" empty="" />
+                                </>
+                            ) : (
+                                <Empty>Anda belum mempunyai tools sendiri.</Empty>
+                            )}
+                        </Panel>
                     </div>
 
                     {/* Status + Type */}
