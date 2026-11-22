@@ -57,10 +57,10 @@ export default function Sidebar({ auth, url }) {
                         icon={IconPencilCheck}
                     />
                 )}
-
-                {hasAnyPermissions(auth.permissions, ['loans.index']) && (
-                    <NavLink url="#" title="Peminjaman" icon={IconTagPlus} />
-                )}
+                {/*
+            {hasAnyPermissions(auth.permissions, ['loans.index']) && (
+                <NavLink url="#" title="Peminjaman" icon={IconTagPlus} />
+            )} */}
 
                 {/* Belum ada permission laporan di PermissionSeeder */}
                 <NavLink

@@ -59,9 +59,9 @@ export default function SidebarResponsive({ auth, url }) {
                     />
                 )}
 
-                {hasAnyPermissions(auth.permissions, ['loans.index']) && (
+                {/* {hasAnyPermissions(auth.permissions, ['loans.index']) && (
                     <NavLink url="#" title="Peminjaman" icon={IconTagPlus} />
-                )}
+                )} */}
 
                 {/* Belum ada permission laporan di PermissionSeeder */}
                 <NavLink
