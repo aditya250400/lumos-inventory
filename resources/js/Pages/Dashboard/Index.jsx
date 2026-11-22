@@ -420,23 +420,52 @@ export default function Dashboard({
                         description="Pengguna dengan jumlah alat terbanyak"
                     >
                         {topHolders?.length ? (
-                            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                            <ul className="divide-y divide-slate-100">
                                 {topHolders.map((holder, i) => (
                                     <li
                                         key={holder.id}
-                                        className="rounded-lg border border-slate-200 bg-blue-50/40 p-3"
+                                        className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+                                        <div className="flex min-w-0 items-center gap-3">
+                                            <span
+                                                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                                                    i === 0
+                                                        ? 'bg-amber-100 text-amber-700'
+                                                        : i === 1
+                                                          ? 'bg-slate-200 text-slate-600'
+                                                          : i === 2
+                                                            ? 'bg-orange-100 text-orange-700'
+                                                            : 'bg-slate-50 text-slate-500'
+                                                }`}
+                                            >
                                                 {i + 1}
                                             </span>
-                                            <span className="truncate text-sm font-medium text-slate-900">
-                                                {holder.name}
-                                            </span>
+
+                                            <div className="min-w-0">
+                                                <p className="truncate text-sm font-semibold text-slate-800">
+                                                    {holder.name}
+                                                </p>
+                                                <p className="text-xs text-slate-500">Pemegang alat</p>
+                                            </div>
                                         </div>
-                                        <p className="mt-2 text-xs text-slate-600">
-                                            {fmt(holder.total_tools)} alat · {fmt(holder.total_stock)} unit
-                                        </p>
+
+                                        <div className="flex shrink-0 items-center gap-4 text-right">
+                                            <div>
+                                                <p className="text-sm font-semibold text-slate-800">
+                                                    {fmt(holder.total_tools)}
+                                                </p>
+                                                <p className="text-[11px] text-slate-500">Jenis alat</p>
+                                            </div>
+
+                                            <div className="h-8 w-px bg-slate-200" />
+
+                                            <div>
+                                                <p className="text-sm font-semibold text-blue-600">
+                                                    {fmt(holder.total_stock)}
+                                                </p>
+                                                <p className="text-[11px] text-slate-500">Total unit</p>
+                                            </div>
+                                        </div>
                                     </li>
                                 ))}
                             </ul>
