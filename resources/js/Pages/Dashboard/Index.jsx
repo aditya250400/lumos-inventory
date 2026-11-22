@@ -233,7 +233,7 @@ export default function Dashboard({
                         icon={IconLayout2}
                     />
                 </div>
-                <div className="mx-auto max-w-7xl space-y-6 py-6">
+                <div className="space-y-6 py-6">
                     {/* Summary */}
                     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                         <StatCard

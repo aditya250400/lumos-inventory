@@ -67,7 +67,7 @@ body {
     font-size: 10pt;
 }
 
-//* INFORMATION */
+/* INFORMATION */
 
 .label-info {
     width: 100%;
@@ -127,11 +127,13 @@ body {
 
 /* =========================================
    PRINT
+   Ukuran halaman (@page size) diatur otomatis
+   lewat JavaScript agar sama dengan tinggi
+   semua label, jadi hasilnya 1 halaman.
 ========================================= */
 
 @media print {
     @page {
-        size: 58mm 100mm;
         margin: 0;
     }
 
@@ -140,6 +142,7 @@ body {
         width: 58mm !important;
         min-width: 58mm !important;
         max-width: 58mm !important;
+        height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
@@ -169,8 +172,6 @@ body {
     .print-label {
         width: 58mm !important;
         margin: 0 !important;
-        break-inside: avoid;
-        page-break-inside: avoid;
     }
 
     .no-print {
