@@ -12,11 +12,10 @@ export default function ToolDetailModal({ open, onOpenChange, tool }) {
 
     const loans = useClientPagination(tool?.loan_history ?? [], 10);
 
-    // print label
     const handlePrintLabel = () => {
         if (!tool) return;
 
-        window.open(route('tools.print-label', tool), '_blank');
+        window.open(route('tools.label-pdf', tool.tool_code), '_blank');
     };
 
     /*

@@ -309,4 +309,64 @@ class ReportController extends Controller
             'tool' => $tool,
         ]);
     }
+
+    public function labelPdf(Tool $tool)
+    {
+        $tool->load(['location.parent', 'usedBy', 'accessories']);
+
+        $mmToPt = 72 / 25.4;
+        $widthPt = 58 * $mmToPt;
+
+        // Mulai dari perkiraan, naikkan sedikit-sedikit sampai pas 1 halaman
+        $heightMm = $this->estimateLabelHeightMm($tool);
+
+        for ($i = 0; $i < 40; $i++) {
+            $pdf = Pdf::loadView('pdf.tool-label', ['tool' => $tool])
+                ->setPaper([0, 0, $widthPt, $heightMm * $mmToPt], 'portrait');
+
+            $pdf->output(); // render
+
+            if ($pdf->getDomPDF()->getCanvas()->get_page_count() <= 1) {
+                break;
+            }
+
+            $heightMm += 3;
+        }
+
+        return $pdf->stream("Label-{$tool->tool_code}.pdf");
+    }
+
+    private function estimateLabelHeightMm(Tool $tool): float
+    {
+        $accessories = $tool->accessories ?? collect();
+
+        $location = $tool->location
+            ? ($tool->location->parent
+                ? "{$tool->location->name} ({$tool->location->parent->name})"
+                : $tool->location->name)
+            : '-';
+
+        // Label utama
+        $rows = 3 + ($tool->status === 'Rusak' ? 1 : 0);
+        $h = 18
+            + ceil(mb_strlen($tool->name) / 24) * 4.8
+            + $rows * 3.8
+            + (ceil(mb_strlen($location) / 28) - 1) * 3.8
+            + 5
+            + ceil((mb_strlen($tool->name) + 2) / 36) * 3.8;
+
+        foreach ($accessories as $item) {
+            $h += ceil((mb_strlen($item->name) + 2) / 36) * 3.8;
+        }
+
+        // Label tiap kelengkapan
+        foreach ($accessories as $item) {
+            $h += 17
+                + ceil(mb_strlen($item->name) / 28) * 4.5
+                + ceil(mb_strlen('Kelengkapan dari ' . $tool->name) / 45) * 3.5;
+        }
+
+        // Sengaja dibuat sedikit di bawah perkiraan, lalu dikoreksi oleh loop
+        return max(40, $h * 0.92);
+    }
 }

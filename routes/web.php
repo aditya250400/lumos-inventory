@@ -154,6 +154,10 @@ Route::middleware('auth')->group(function () {
         ReportController::class,
         'printLabel',
     ])->name('tools.print-label');
+
+    // label pdf
+    Route::get('/tools/{tool:tool_code}/label-pdf', [ReportController::class, 'labelPdf'])
+        ->name('tools.label-pdf');
 });
 
 

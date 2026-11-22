@@ -3,8 +3,8 @@ import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Textarea } from '@/Components/ui/textarea';
 import { Dialog, DialogContent, DialogTitle } from '@/Components/ui/dialog';
-import { IconPlus, IconStar, IconTrash } from '@tabler/icons-react';
-import { useState } from 'react';
+import { IconCamera, IconPhoto, IconPlus, IconStar, IconTrash } from '@tabler/icons-react';
+import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/compressImage';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
@@ -30,6 +30,10 @@ export default function ToolFormFields({
 }) {
     const [selectedImage, setSelectedImage] = useState(null);
 
+    // Input file tersembunyi: satu untuk galeri, satu untuk kamera
+    const galleryInputRef = useRef(null);
+    const cameraInputRef = useRef(null);
+
     const selectedCategory = categories.find((c) => String(c.id) === String(data.category_id));
 
     const selectedLocation = locations.find((location) => String(location.id) === String(data.location_id));
@@ -54,6 +58,50 @@ export default function ToolFormFields({
                 value,
             },
         ]);
+    };
+
+    // =====================================================
+    // HANDLER FOTO (dipakai oleh input galeri & kamera)
+    // =====================================================
+
+    const handleFiles = async (e) => {
+        const files = Array.from(e.target.files ?? []);
+
+        // Reset input supaya file yang sama bisa dipilih lagi
+        e.target.value = '';
+
+        if (files.length === 0) {
+            return;
+        }
+
+        // Hanya image yang diperbolehkan
+        const invalidFiles = files.filter((file) => !file.type.startsWith('image/'));
+
+        if (invalidFiles.length > 0) {
+            toast.error('File tidak valid. Hanya file gambar yang diperbolehkan.');
+
+            return;
+        }
+
+        // Compress image
+        try {
+            const compressedFiles = await Promise.all(
+                files.map((file) =>
+                    compressImage(file, {
+                        maxWidth: 1600,
+                        maxHeight: 1600,
+                        quality: 0.8,
+                        type: 'image/jpeg',
+                    }),
+                ),
+            );
+
+            onAddImages(compressedFiles);
+        } catch (error) {
+            console.error('Gagal compress gambar:', error);
+
+            toast.error('Gagal memproses gambar. Silakan coba lagi.');
+        }
     };
 
     return (
@@ -323,7 +371,7 @@ export default function ToolFormFields({
                     <p className="mb-2 text-lg font-semibold">Foto Tool</p>
 
                     <div className="rounded-lg border p-4">
-                        <Label className="mb-2 block">Upload foto (bisa lebih dari satu)</Label>
+                        <Label className="mb-2 block">Tambah foto (bisa lebih dari satu)</Label>
 
                         <div className="flex flex-wrap gap-3">
                             {images.map((image) => (
@@ -377,64 +425,45 @@ export default function ToolFormFields({
                                 </div>
                             ))}
 
-                            {/* Upload */}
-                            <label className="flex size-24 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground hover:bg-muted/40">
-                                <IconPlus className="size-6" />
+                            {/* Tombol Galeri */}
+                            <button
+                                type="button"
+                                onClick={() => galleryInputRef.current?.click()}
+                                className="flex size-24 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed text-muted-foreground hover:bg-muted/40"
+                            >
+                                <IconPhoto className="size-6" />
+                                <span className="text-xs">Galeri</span>
+                            </button>
 
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    className="hidden"
-                                    onChange={async (e) => {
-                                        const files = Array.from(e.target.files ?? []);
+                            {/* Tombol Kamera */}
+                            <button
+                                type="button"
+                                onClick={() => cameraInputRef.current?.click()}
+                                className="flex size-24 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed text-muted-foreground hover:bg-muted/40"
+                            >
+                                <IconCamera className="size-6" />
+                                <span className="text-xs">Kamera</span>
+                            </button>
 
-                                        // Reset input supaya file yang sama
-                                        // bisa dipilih lagi
-                                        e.target.value = '';
+                            {/* Input tersembunyi: galeri (boleh banyak foto) */}
+                            <input
+                                ref={galleryInputRef}
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                className="hidden"
+                                onChange={handleFiles}
+                            />
 
-                                        if (files.length === 0) {
-                                            return;
-                                        }
-
-                                        // =====================================================
-                                        // VALIDASI FILE
-                                        // Hanya image yang diperbolehkan
-                                        // =====================================================
-
-                                        const invalidFiles = files.filter((file) => !file.type.startsWith('image/'));
-
-                                        if (invalidFiles.length > 0) {
-                                            toast.error('File tidak valid. Hanya file gambar yang diperbolehkan.');
-
-                                            return;
-                                        }
-
-                                        // =====================================================
-                                        // COMPRESS IMAGE
-                                        // =====================================================
-
-                                        try {
-                                            const compressedFiles = await Promise.all(
-                                                files.map((file) =>
-                                                    compressImage(file, {
-                                                        maxWidth: 1600,
-                                                        maxHeight: 1600,
-                                                        quality: 0.8,
-                                                        type: 'image/jpeg',
-                                                    }),
-                                                ),
-                                            );
-
-                                            onAddImages(compressedFiles);
-                                        } catch (error) {
-                                            console.error('Gagal compress gambar:', error);
-
-                                            toast.error('Gagal memproses gambar. Silakan coba lagi.');
-                                        }
-                                    }}
-                                />
-                            </label>
+                            {/* Input tersembunyi: kamera belakang (1 foto per ambil) */}
+                            <input
+                                ref={cameraInputRef}
+                                type="file"
+                                accept="image/*"
+                                capture="environment"
+                                className="hidden"
+                                onChange={handleFiles}
+                            />
                         </div>
 
                         <p className="mt-3 text-xs text-muted-foreground">

@@ -125,6 +125,15 @@ export default function PrintLabel({ tool }) {
                 {/* TOMBOL CETAK, TIDAK IKUT DICETAK */}
                 <div className="no-print print-actions">
                     <button onClick={handlePrint}>Cetak Label</button>
+
+                    <a
+                        href={route('tools.label-pdf', tool.tool_code)}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ marginLeft: 8, color: '#2563eb', textDecoration: 'underline' }}
+                    >
+                        Buka PDF (untuk HP)
+                    </a>
                 </div>
             </div>
         </>
